@@ -1,0 +1,9 @@
+{
+    "Admin": true,
+    "Core": true,
+    "Config": true,
+    "Settings": true,
+    "Events": true,
+    "Cron": true,
+    "ApiService": true
+}

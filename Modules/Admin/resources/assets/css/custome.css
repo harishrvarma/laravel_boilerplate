@@ -1,0 +1,22 @@
+html, body {
+    height: 100%; /* Make sure the body takes the full height of the viewport */
+    margin: 0; /* Remove default margins */
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the page fills the entire height */
+}
+
+.content {
+    flex: 1; /* This makes the content area flexible, allowing the footer to stay at the bottom */
+}
+
+.navbar.bg-dark {
+    background-color: #343a40 !important; /* Dark background color */
+}
+
+.navbar .nav-link {
+    color: white !important; /* Ensure text is white */
+}
