@@ -1,18 +1,17 @@
 <?php
-namespace Modules\Admin\View\Components\Role\Listing;
+namespace Modules\Admin\View\Components\AdminRole\Listing;
 
-use Modules\Admin\Models\Role;
+use Modules\Admin\Models\AdminRole;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
 class Grid extends CoreGrid
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->title('Manage Roles');
+    }
     public function prepareColumns()
     {
-        $this->column('mass_ids', [
-            'name'=>'id',
-            'label'=>'',
-            'renderer'=>'core::listing.grid.columns.massIds',
-        ]);
-
         $this->column('id', [
             'name'=>'id',
             'label'=>'Id',
@@ -22,6 +21,12 @@ class Grid extends CoreGrid
         $this->column('name', [
             'name'=>'name',
             'label'=>'Name',
+            'sortable'=>true,
+        ]);
+
+        $this->column('description', [
+            'name'=>'description',
+            'label'=>'Description',
             'sortable'=>true,
         ]);
 
@@ -66,20 +71,32 @@ class Grid extends CoreGrid
     {
         $this->filter('name', [
             'type'  => 'text',
-            'label' => 'Name',
+            'name' => 'name',
+        ]);
+
+        $this->filter('description', [
+            'type'  => 'text',
+            'name' => 'description',
         ]);
 
         $this->filter('created_at', [
             'type'  => 'date',
-            'label' => 'Created Date',
+            'name' => 'created_at',
         ]);
 
         return $this;
     }
+
+    public function prepareButtons(){
+        $this->button('add', [
+            'label' => 'Add Role',
+            'route' =>urlx('admin.role.add',[],true),
+        ]);
+    }
     
     public function prepareCollection() 
     {
-        $role = $this->model(Role::class);
+        $role = $this->model(AdminRole::class);
         $query = $role->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());

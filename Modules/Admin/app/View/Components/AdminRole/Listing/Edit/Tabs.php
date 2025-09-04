@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Admin\View\Components\Role\Listing\Edit;
+namespace Modules\Admin\View\Components\AdminRole\Listing\Edit;
 
 use Modules\Core\View\Components\Listing\Edit\Tabs as CoreTabs;
 use Exception;
@@ -15,7 +15,7 @@ class Tabs extends CoreTabs
         $this->tab('role', [
             'key' => 'role',
             'title' => 'Role',
-            'tabClassName'=>'\Modules\Admin\View\Components\Role\Listing\Edit\Tabs\General',
+            'tabClassName'=>'\Modules\Admin\View\Components\AdminRole\Listing\Edit\Tabs\General',
         ]);
         return $this;
     }

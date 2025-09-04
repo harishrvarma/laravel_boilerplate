@@ -1,15 +1,16 @@
 <?php
 
-namespace Modules\Admin\View\Components\Role\Listing;
+namespace Modules\Admin\View\Components\AdminResource\Listing;
 
 use Modules\Core\View\Components\Listing\Edit as CoreEdit;
 
 class Edit extends CoreEdit
 {
-    protected $tabsClassName = '\Modules\Admin\View\Components\Role\Listing\Edit\Tabs';
+    protected $tabsClassName = '\Modules\Admin\View\Components\AdminResource\Listing\Edit\Tabs';
 
     public function __construct(){
-        parent::__construct();
+        parent::__construct(); 
+        $this->title('Add/Edit Resources');
     }
 
     public function prepareButtons(){
@@ -23,15 +24,15 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.role.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.resource.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->id){
-            return  urlx('admin.role.save',['id'=>$this->row()->id]);
+            return  urlx('admin.resource.save',['id'=>$this->row()->id]);
         }
-        return  urlx('admin.role.save');
+        return  urlx('admin.resource.save');
     }
 }

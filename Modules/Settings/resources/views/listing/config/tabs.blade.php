@@ -1,17 +1,16 @@
 <div class="card shadow-sm">
-        <div class="d-flex gap-2">
-            <a href="{{ $me->urlx('settings.config.add',['tab' => 'group']) }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-folder-plus me-1"></i> Add Config Group
-            </a>
-            <a href="{{ $me->urlx('settings.config.addFields',['tab' => 'fields', 'activeTab' => $me->activeTabKey()]) }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-square me-1"></i> Add Config Field
-            </a>
-        </div>
-
+    <div class="d-flex justify-content-end mt-2 me-2 gap-2">
+        <a href="{{ $me->urlx('admin.config.add',['tab' => 'group']) }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-folder-plus me-1"></i> Add Group
+        </a>
+        <a href="{{ $me->urlx('admin.config.addFields',['tab' => 'fields', 'activeTab' => $me->activeTabKey()]) }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-square me-1"></i> Add Field
+        </a>
+    </div>
     <div class="card-body">
         <div class="row">
             {{-- Left Sidebar Tabs --}}
-            <div class="col-md-3 border-end">
+            <div class="col-md-3 pe-0">
                 <div class="list-group" id="settings-list" role="tablist">
                     @foreach($me->tabs() as $key => $tab)
                         <a 
@@ -28,20 +27,22 @@
             </div>
 
             {{-- Right Side Content --}}
-            <div class="col-md-9">
-                <div class="tab-content p-2" id="edit-content">
-                    @php
-                        $tab = $me->activeTab();
-                        if ($tab) {
-                            echo $me->block($tab['tabClassName'])->row($me->row())->render();
-                        }
-                    @endphp
+            <div class="col-md-9 ps-3">
+                <div class="card border-2 border-dark shadow-sm h-100">
+                    <div class="card-body" id="edit-content">
+                        @php
+                            $tab = $me->activeTab();
+                            if ($tab) {
+                                echo $me->block($tab['tabClassName'])->row($me->row())->render();
+                            }
+                        @endphp
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card-footer text-right">
+    <div class="card-footer text-end">
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </div>
 </div>

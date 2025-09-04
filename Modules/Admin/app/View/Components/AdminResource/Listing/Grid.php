@@ -1,0 +1,72 @@
+<?php
+namespace Modules\Admin\View\Components\AdminResource\Listing;
+
+use Modules\Admin\Models\AdminResource;
+use Modules\Core\View\Components\Listing\Grid as CoreGrid;
+class Grid extends CoreGrid
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->title('Manage Resources');
+    }
+    public function prepareColumns()
+    {
+        $this->column('id', [
+            'name'=>'id',
+            'label'=>'Id',
+            'sortable'=>true,
+        ]);
+
+        $this->column('code', [
+            'name'=>'code',
+            'label'=>'Code',
+            'sortable'=>true,
+        ]);
+
+        $this->column('description', [
+            'name'=>'description',
+            'label'=>'Description',
+            'sortable'=>true,
+        ]);
+
+        $this->column('created_at', [
+            'name'=>'created_at',
+            'label'=>'Created Date',
+            'sortable'=>true,
+        ]);
+        return $this;
+    }
+
+    public function prepareFilters()
+    {
+        $this->filter('code', [
+            'type'  => 'text',
+            'name' => 'code',
+        ]);
+
+        $this->filter('description', [
+            'type'  => 'text',
+            'name' => 'description',
+        ]);
+
+        $this->filter('created_at', [
+            'type'  => 'date',
+            'name' => 'created_at',
+        ]);
+
+        return $this;
+    }
+    
+    public function prepareCollection() 
+    {
+        $resource = $this->model(AdminResource::class);
+        $query = $resource->query();
+        if($this->sortColumn() && $this->sortDir()){
+             $query->orderBy($this->sortColumn(), $this->sortDir());
+        }
+        $this->applyFilters($query);
+        $this->pager($query);
+        return $this;
+    }
+}

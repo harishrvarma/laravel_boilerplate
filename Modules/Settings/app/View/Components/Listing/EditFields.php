@@ -10,6 +10,7 @@ class EditFields extends CoreEdit
 
     public function __construct(){
         parent::__construct();
+        $this->title('Add Fields');
     }
 
     public function prepareButtons(){
@@ -23,15 +24,15 @@ class EditFields extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . route('settings.config.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.config.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->id){
-            return  urlx('settings.config.saveFields',['id'=>$this->row()->id]);
+            return  urlx('admin.config.saveFields',['id'=>$this->row()->id]);
         }
-        return  urlx('settings.config.saveFields');
+        return  urlx('admin.config.saveFields');
     }
 }

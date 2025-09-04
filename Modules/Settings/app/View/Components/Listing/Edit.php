@@ -10,6 +10,7 @@ class Edit extends CoreEdit
 
     public function __construct(){
         parent::__construct();
+        $this->title('Add Group');
     }
 
     public function prepareButtons(){
@@ -23,15 +24,15 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . route('settings.config.listing') . "'",
+            'method' => "window.location.href='" . route('admin.config.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->id){
-            return  route('settings.config.save',['id'=>$this->row()->id]);
+            return  route('admin.config.save',['id'=>$this->row()->id]);
         }
-        return  route('settings.config.save');
+        return  route('admin.config.save');
     }
 }

@@ -10,15 +10,15 @@ class Config extends CoreEdit
 
     public function __construct(){
         parent::__construct();
-        $this->title('Setting Groups');
+        $this->title('Config Groups');
     }
 
     public function saveUrl(){
         $id = request('tab');
         if($id){
-            return  route('settings.config.saveConfig',['id'=>$id]);
+            return  route('admin.config.saveConfig',['id'=>$id]);
         }
-        return  route('settings.config.saveConfig');
+        return  route('admin.config.saveConfig');
     }
 
 }

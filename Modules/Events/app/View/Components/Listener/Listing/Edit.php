@@ -8,8 +8,10 @@ class Edit extends CoreEdit
 {
     protected $tabsClassName = '\Modules\Events\View\Components\Listener\Listing\Edit\Tabs';
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
+        $this->title('Add/Edit Listener');
     }
 
     public function prepareButtons(){

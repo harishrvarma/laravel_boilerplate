@@ -5,6 +5,11 @@ use Modules\Events\Models\Events;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
 class Grid extends CoreGrid
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->title('Manage Events');
+    }
     public function prepareColumns()
     {
         $this->column('mass_ids', [

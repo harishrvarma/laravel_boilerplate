@@ -26,9 +26,9 @@ class General extends CoreForm
             'id'=>'resource_id',
             'name'=>'apiresource[resource_id][]',
             'label'=>'Resource',
-            'fieldClassName'=> '\Modules\ApiService\View\Components\ApiRole\Listing\Edit\Form\Select',
             'type' => 'select',
-            'multiselect' => 'multiple',
+            'multiselect' => true,
+            'relation' => 'resource',
             'options' => $this->resourceOptions()
         ]);
         return $this;

@@ -33,7 +33,7 @@ class General extends CoreForm
         $this->field('status',[
             'id'=>'status',
             'name'=>'event[status]',
-            'label'=>'Event',
+            'label'=>'Status',
             'type' => 'select',
             'options'=> [1=>'Active',2=>'Inactive'],
         ]);

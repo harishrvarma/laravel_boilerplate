@@ -7,6 +7,7 @@ Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
 use Modules\Admin\Models\Admin;
 use Illuminate\Support\Facades\Hash;
+use Modules\Admin\Models\AdminUserRole;
 use Modules\Admin\View\Components\Admin\Listing\Edit;
  
 
@@ -49,6 +50,19 @@ class AdminController extends BackendController
             }
             else{
                 $admin = Admin::create($params);
+            }
+            $params = $request->post('role');
+            
+            AdminUserRole::where('admin_id', $admin->id)->delete();
+            
+            if (!is_null($params) && isset($params['role_id'])) {
+                $resourceIds = array_unique($params['role_id']);
+                foreach ($resourceIds as $value) {
+                    AdminUserRole::create([
+                        'admin_id' => $admin->id,
+                        'role_id' => $value,
+                    ]);
+                }
             }
             if($admin->id){
                 return redirect()->route('admin.admin.listing')->with('success','Record saved');

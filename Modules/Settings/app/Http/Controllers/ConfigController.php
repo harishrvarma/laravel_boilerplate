@@ -72,7 +72,7 @@ class ConfigController extends BackendController
     
             if ($configGroup && $configGroup->id) {
                 return redirect()
-                    ->route('settings.config.listing')
+                    ->route('admin.config.listing')
                     ->with('success', 'Configuration Group saved successfully');
             } else {
                 throw new \Exception('Something went wrong while saving the Config Group');
@@ -128,7 +128,7 @@ class ConfigController extends BackendController
             }
 
             return redirect()
-                ->to(urlx('settings.config.listing', ['tab' => $tab],true));
+                ->to(urlx('admin.config.listing', ['tab' => $tab],true));
 
         } catch (\Exception $e) {
             return redirect()
@@ -167,7 +167,7 @@ class ConfigController extends BackendController
             }
     
             return redirect()
-                ->route('settings.config.listing', ['tab' => $groupId])
+                ->route('admin.config.listing', ['tab' => $groupId])
                 ->with('success', 'Configuration saved successfully');
     
         } catch (\Exception $e) {
@@ -177,17 +177,68 @@ class ConfigController extends BackendController
                 ->with('error', $e->getMessage());
         }
     }
-    
-    // public function delete($id)
+
+    public function edit($id)
+    {
+        try {
+            $config = ConfigKey::find($id);
+            if (!$config || !$config->id) {
+                throw new Exception("Invalid Request");
+            }
+
+            $edit = new \Modules\Settings\View\Components\Config\Listing\Edit();
+            $edit->row($config);
+
+            $layout  = $this->layout();
+            $content = $layout->getChild('content');
+            $content->addChild('edit', $edit);
+            return $layout->render();
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            $params = $request->post();
+            $configGroup = ConfigGroup::findOrFail($params['id']);
+            $configGroup->name = $params['title'];
+            $configGroup->save();
+
+            return redirect()->back()->with('success', 'Config group updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            dd($id);
+            $config = ConfigGroup::find($id);
+            if (!$config || !$config->id) {
+                throw new Exception("Invalid Request");
+            }
+            $config->delete();
+
+            return redirect()->route('admin.config.listing')->with('success', 'Config deleted');
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    // public function massDelete(Request $request)
     // {
     //     try {
-    //         $config = ConfigKey::find($id);
-    //         if (!$config || !$config->id) {
-    //             throw new Exception("Invalid Request");
+    //         $ids = $request->post('mass_ids');
+    //         if (is_null($ids)) {
+    //             throw new Exception('Invalid Ids');
     //         }
-    //         $config->delete();
 
-    //         return redirect()->route('admin.config.listing')->with('success', 'Config deleted');
+    //         ConfigKey::destroy($ids);
+
+    //         return redirect()->route('admin.config.listing')->with('success', 'Configs deleted');
     //     } catch (Exception $e) {
     //         return redirect()->back()->with('error', $e->getMessage());
     //     }

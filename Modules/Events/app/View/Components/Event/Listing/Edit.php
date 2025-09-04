@@ -8,8 +8,10 @@ class Edit extends CoreEdit
 {
     protected $tabsClassName = '\Modules\Events\View\Components\Event\Listing\Edit\Tabs';
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
+        $this->title('Add/Edit Event');
     }
 
     public function prepareButtons(){

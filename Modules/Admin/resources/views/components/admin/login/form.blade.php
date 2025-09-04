@@ -1,7 +1,7 @@
-<div class="login-box mx-auto mt-5" style="max-width: 500px;">
-    <div class="card shadow">
-        <div class="card-header bg-dark text-white text-center">
-            <h3>User Login</h3>
+<div class="login-box">
+    <div class="card card-outline card-primary">
+        <div class="card-header text-center">
+            <h3 class="mb-0">User Login</h3>
         </div>
 
         <div class="card-body login-card-body">
@@ -30,9 +30,11 @@
                         value="{{ old('email') }}"
                         required
                     >
-                    <span class="input-group-text">
-                        <i class="fas fa-envelope"></i>
-                    </span>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                    </div>
                     @error('email')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
@@ -47,9 +49,11 @@
                         placeholder="Password"
                         required
                     >
-                    <span class="input-group-text">
-                        <i class="fas fa-lock"></i>
-                    </span>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
                     @error('password')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
@@ -58,7 +62,7 @@
                 {{-- Submit --}}
                 <div class="row">
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
                     </div>
                 </div>
 

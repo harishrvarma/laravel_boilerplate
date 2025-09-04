@@ -33,9 +33,9 @@ class General extends CoreForm
             'id'=>'role_id',
             'name'=>'apirole[role_id][]',
             'label'=>'Role',
-            'fieldClassName'=> '\Modules\ApiService\View\Components\ApiUser\Listing\Edit\Form\Select',
             'type' => 'select',
-            'multiselect' => 'multiple',
+            'multiselect' => true,
+            'relation' => 'role',
             'options' => $this->roleOptions()
         ]);
 

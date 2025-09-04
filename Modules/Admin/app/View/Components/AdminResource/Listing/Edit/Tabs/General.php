@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Admin\View\Components\role\Listing\Edit\Tabs;
+namespace Modules\Admin\View\Components\AdminResource\Listing\Edit\Tabs;
 
 use Modules\Core\View\Components\Listing\Edit\Form as CoreForm;
 
@@ -10,11 +10,18 @@ class General extends CoreForm
         parent::__construct();
     }
     public function prepareFields(){
-        $this->field('name',[
-            'id'=>'name',
-            'name'=>'role[name]',
-            'label'=>'Name',
+        $this->field('code',[
+            'id'=>'code',
+            'name'=>'resource[code]',
+            'label'=>'code',
             'type' => 'text',
+        ]);
+
+        $this->field('description',[
+            'id'=>'description',
+            'name'=>'resource[description]',
+            'label'=>'Description',
+            'type' => 'textarea',
         ]);
         return $this;
     }

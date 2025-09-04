@@ -4,6 +4,7 @@ namespace Modules\Admin\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Admin\Models\AdminResource;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -27,6 +28,9 @@ class AdminServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->app->booted(function () use (&$routes) {
+             $this->syncAdminResources(\Route::getRoutes());
+        });
     }
 
     /**
@@ -150,5 +154,82 @@ class AdminServiceProvider extends ServiceProvider
         }
 
         return $paths;
+    }
+
+    public function syncAdminResources($routes)
+    {
+        // Get only admin routes with a name
+        $adminRoutes = collect($routes)->filter(function ($route) {
+            return str_starts_with($route->uri(), 'admin/') && $route->getName();
+        });
+    
+        $newCodes = [];
+    
+        foreach ($adminRoutes as $route) {
+            $code = $route->getName();
+            $methods = implode('|', $route->methods());
+    
+            // use route default label if available
+            $label = $route->defaults['label'] ?? ucfirst(last(explode('.', $code))) ?? $code;
+            $newCodes[] = $code;
+    
+            $this->createResourceTree($route);
+    
+            // Create hierarchical tree with full route
+            
+        }
+    
+        // Deactivate removed routes
+        AdminResource::whereNotIn('code', $newCodes)->update(['status' => '0']);
+    }
+
+    public function createResourceTree($route)
+    {
+        $routeName = $route->getName();
+        $parts = explode('.', $routeName);
+
+        if ($parts[0] !== 'admin') {
+            return;
+        }
+
+        $parentId = null;
+        $code = '';
+        $pathIds = '';
+        foreach ($parts as $level => $part) {
+            $code = $code ? $code . '.' . $part : $part;
+    
+            $isLast = $level + 1 === count($parts);
+
+        // 👇 For `name` we always take the last part
+            $name = $isLast ? ucfirst(str_replace('_', ' ', $part)) : null;
+            // Try to pick a label for each part
+            $label = $route->defaults['label'] ?? ucfirst($part) ?? $routeName;
+    
+            $resource = AdminResource::updateOrCreate(
+                ['code' => $code],
+                [
+                    'name'       => $isLast ? $name : $resource->name ?? ucfirst($part),
+                    'label'      => $label,
+                    'route_name' => $level + 1 === count($parts) ? $routeName : $code . '.*',
+                    'uri'        => $isLast ? $route->uri() : null,
+                    'method'     => $level + 1 === count($parts) ? implode('|', $route->methods()) : 'ANY',
+                    'level'      => $level + 1,
+                    'parent_id'  => $parentId,
+                    'status'     => '1',
+                ]
+            );
+    
+            $pathIds = $parentId
+                ? AdminResource::find($parentId)->path_ids . $resource->id . '/'
+                : '/' . $resource->id . '/';
+    
+            $resource->update([
+                'path_ids'  => $pathIds,
+                'parent_id' => $parentId,
+                'level'     => $level + 1,
+            ]);
+    
+            $parentId = $resource->id;
+        }
     }
 }

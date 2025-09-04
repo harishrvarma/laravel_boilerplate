@@ -19,10 +19,6 @@ class AdminApiController extends Controller
     public function save(Request $request){
         try{
             $params = $request->post('admin');
-            if(isset($params['password'])){
-                $params['password'] = Hash::make($params['password']);
-            }
-
             if($id = $request->get('id')){
                 $admin = Admin::find($id);
                 if(!$admin->id){

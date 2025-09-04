@@ -43,9 +43,9 @@ class Grid extends CoreGrid
             'label'=>'email',
             'sortable'=>true,
         ]);
-        $this->column('phone', [
-            'name'=>'phone',
-            'label'=>'Phone',
+        $this->column('username', [
+            'name'=>'username',
+            'label'=>'Username',
             'sortable'=>true,
         ]);
         $this->column('created_at', [
@@ -88,9 +88,9 @@ class Grid extends CoreGrid
             'name' => 'email',
         ]);
 
-        $this->filter('phone', [
+        $this->filter('username', [
             'type'  => 'text',
-            'name' => 'phone',
+            'name' => 'username',
         ]);
 
         $this->filter('created_at', [
