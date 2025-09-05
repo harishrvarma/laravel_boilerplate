@@ -1,7 +1,7 @@
 <?php
-namespace Modules\Admin\View\Components\AdminRole\Listing;
+namespace Modules\Admin\View\Components\Role\Listing;
 
-use Modules\Admin\Models\AdminRole;
+use Modules\Admin\Models\Role;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
 class Grid extends CoreGrid
 {
@@ -12,6 +12,13 @@ class Grid extends CoreGrid
     }
     public function prepareColumns()
     {
+        if(canAccess('admin.role.massDelete')){
+            $this->column('mass_ids', [
+                'name'=>'id',
+                'label'=>'',
+                'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
+            ]);
+        }
         $this->column('id', [
             'name'=>'id',
             'label'=>'Id',
@@ -40,31 +47,32 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        $this->action('edit' , [
-            'id' => 'editBtn',
-            'title' => 'Edit',
-            'url' => 'admin.role.edit'
-        ]);
-        $this->action('delete' , [
-            'id' => 'deleteBtn',
-            'title' => 'Delete',
-            'url' => 'admin.role.delete'
-        ]);
+        if(canAccess('admin.role.edit')){
+            $this->action('edit' , [
+                'id' => 'editBtn',
+                'title' => 'Edit',
+                'url' => 'admin.role.edit'
+            ]);
+        }
+        if(canAccess('admin.role.delete')){
+            $this->action('delete' , [
+                'id' => 'deleteBtn',
+                'title' => 'Delete',
+                'url' => 'admin.role.delete'
+            ]);
+        }
         return $this;
     }
 
     public function prepareMassActions(){
-        parent::prepareMassActions();
-        $this->massAction('delete', [
-            'value'=>'mass_delete',
-            'label' =>'Delete Selected',
-            'url' => 'admin.role.massDelete',
-        ]);
-        $this->massAction('export', [
-            'value'=>'mass_export',
-            'label' =>'Export Selected',
-            'url' => 'admin.role.massExport',
-        ]);
+        if(canAccess('admin.role.massDelete')){
+            parent::prepareMassActions();
+            $this->massAction('delete', [
+                'value'=>'mass_delete',
+                'label' =>'Delete Selected',
+                'url' => 'admin.role.massDelete',
+            ]);
+        }
     }
 
     public function prepareFilters()
@@ -88,15 +96,17 @@ class Grid extends CoreGrid
     }
 
     public function prepareButtons(){
-        $this->button('add', [
-            'label' => 'Add Role',
-            'route' =>urlx('admin.role.add',[],true),
-        ]);
+        if(canAccess('admin.role.add')){
+            $this->button('add', [
+                'label' => 'Add Role',
+                'route' =>urlx('admin.role.add',[],true),
+            ]);
+        }
     }
     
     public function prepareCollection() 
     {
-        $role = $this->model(AdminRole::class);
+        $role = $this->model(Role::class);
         $query = $role->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());

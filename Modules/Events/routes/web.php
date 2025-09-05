@@ -4,10 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Modules\Events\Http\Controllers\EventsController;
 use Modules\Admin\Http\Middleware\AdminAuthenticate;
 use Modules\Events\Http\Controllers\ListenerController;
+use Modules\Admin\Http\Middleware\AdminPermission;
+
 
 Route::prefix('admin')->group(function(){
     
-    Route::middleware(AdminAuthenticate::class)->group(function () {
+    Route::middleware([AdminAuthenticate::class,AdminPermission::class])->group(function () {
         Route::match(['GET','POST'], '/event/listing', [EventsController::class,'listing'])
         ->name('admin.event.listing')->defaults('label', 'Event Listing');
         Route::get('/event/add', [EventsController::class,'add'])->name('admin.event.add')->defaults('label', 'Add Event');

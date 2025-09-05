@@ -14,11 +14,13 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        $this->column('mass_ids', [
-            'name'=>'id',
-            'label'=>'',
-            'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
-        ]);
+        if(canAccess('admin.cron.massDelete')){
+            $this->column('mass_ids', [
+                'name'=>'id',
+                'label'=>'',
+                'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
+            ]);
+        }
 
         $this->column('id', [
             'name'=>'id',
@@ -53,17 +55,20 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        $this->action('edit' , [
-            'id' => 'editBtn',
-            'title' => 'Edit',
-            'url' => 'admin.cron.edit'
-        ]);
-
-        $this->action('delete' , [
-            'id' => 'deleteBtn',
-            'title' => 'Delete',
-            'url' => 'admin.cron.delete'
-        ]);
+        if(canAccess('admin.cron.edit')){
+            $this->action('edit' , [
+                'id' => 'editBtn',
+                'title' => 'Edit',
+                'url' => 'admin.cron.edit'
+            ]);
+        }
+        if(canAccess('admin.cron.delete')){
+            $this->action('delete' , [
+                'id' => 'deleteBtn',
+                'title' => 'Delete',
+                'url' => 'admin.cron.delete'
+            ]);
+        }
         return $this;
     }
 
@@ -98,24 +103,23 @@ class Grid extends CoreGrid
     }
 
     public function prepareMassActions(){
-        parent::prepareMassActions();
-        $this->massAction('delete', [
-            'value'=>'mass_delete',
-            'label' =>'Delete Selected',
-            'url' => 'admin.cron.massDelete',
-        ]);
-        $this->massAction('export', [
-            'value'=>'mass_export',
-            'label' =>'Export Selected',
-            'url' => 'admin.cron.massExport',
-        ]);
+        if(canAccess('admin.cron.massDelete')){
+            parent::prepareMassActions();
+            $this->massAction('delete', [
+                'value'=>'mass_delete',
+                'label' =>'Delete Selected',
+                'url' => 'admin.cron.massDelete',
+            ]);
+        }
     }
 
     public function prepareButtons(){
-        $this->button('add', [
-            'route' =>urlx('admin.cron.add',[],true),
-            'label' => 'Add Cron',
-        ]);
+        if(canAccess('admin.cron.add')){
+            $this->button('add', [
+                'route' =>urlx('admin.cron.add',[],true),
+                'label' => 'Add Cron',
+            ]);
+        }
     }
     
     public function prepareCollection() 

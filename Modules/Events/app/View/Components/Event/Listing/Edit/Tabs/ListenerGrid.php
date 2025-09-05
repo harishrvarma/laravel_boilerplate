@@ -34,16 +34,20 @@ class ListenerGrid extends CoreGrid
 
     public function prepareActions()
     {
-        $this->action('edit' , [
-            'id' => 'editBtn',
-            'title' => 'Edit',
-            'url' => 'admin.listener.edit'
-        ]);
-        $this->action('delete' , [
-            'id' => 'deleteBtn',
-            'title' => 'Delete',
-            'url' => 'admin.listener.delete'
-        ]);
+        if(canAccess('admin.listener.edit')){    
+            $this->action('edit' , [
+                'id' => 'editBtn',
+                'title' => 'Edit',
+                'url' => 'admin.listener.edit'
+            ]);
+        }
+        if(canAccess('admin.listener.delete')){
+            $this->action('delete' , [
+                'id' => 'deleteBtn',
+                'title' => 'Delete',
+                'url' => 'admin.listener.delete'
+            ]);
+        }
         return $this;
     }
 

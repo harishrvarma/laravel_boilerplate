@@ -1,11 +1,15 @@
 <div class="card shadow-sm">
     <div class="d-flex justify-content-end mt-2 me-2 gap-2">
-        <a href="{{ $me->urlx('admin.config.add',['tab' => 'group']) }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-folder-plus me-1"></i> Add Group
-        </a>
-        <a href="{{ $me->urlx('admin.config.addFields',['tab' => 'fields', 'activeTab' => $me->activeTabKey()]) }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-square me-1"></i> Add Field
-        </a>
+        @if(canAccess('admin.config.add'))
+            <a href="{{ $me->urlx('admin.config.add',['tab' => 'group']) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-folder-plus me-1"></i> Add Group
+            </a>
+        @endif
+        @if(canAccess('admin.config.addFields'))
+            <a href="{{ $me->urlx('admin.config.addFields',['tab' => 'fields', 'activeTab' => $me->activeTabKey()]) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-square me-1"></i> Add Field
+            </a>
+        @endif
     </div>
     <div class="card-body">
         <div class="row">
@@ -42,7 +46,9 @@
         </div>
     </div>
 
-    <div class="card-footer text-end">
-        <button type="submit" class="btn btn-primary">Save Settings</button>
-    </div>
+    @if(canAccess('admin.config.saveConfig'))
+        <div class="card-footer text-end">
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </div>
+    @endif
 </div>

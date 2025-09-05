@@ -48,7 +48,7 @@ class General extends CoreForm
             'label'=>'Role',
             'type' => 'select',
             'multiselect' => true,
-            'relation' => 'roles',
+            'relation' => 'role',
             'options' => $this->roleOptions()
         ]);
         $this->field('password',[
@@ -61,7 +61,7 @@ class General extends CoreForm
     }
 
     public function roleOptions(){
-        $roles = \Modules\Admin\Models\AdminRole::all();
+        $roles = \Modules\Admin\Models\Role::all();
         $options = [];
         foreach($roles as $role){
             $options[$role->id] = $role->name;

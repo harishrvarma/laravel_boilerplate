@@ -5,8 +5,8 @@ namespace Modules\Admin\Http\Controllers;
 use Exception;
 Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
-use Modules\Admin\Models\AdminRole;
-use Modules\Admin\Models\AdminRoleResource;
+use Modules\Admin\Models\Role;
+use Modules\Admin\Models\RoleResource;
 
 class RoleController extends BackendController
 {
@@ -14,7 +14,7 @@ class RoleController extends BackendController
      public function listing(Request $request)
     {
         
-        $listing = new \Modules\Admin\View\Components\AdminRole\Listing();
+        $listing = new \Modules\Admin\View\Components\Role\Listing();
         $layout = $this->layout();
         $content = $layout->child('content');
         $content->child('listing',$listing);
@@ -24,8 +24,8 @@ class RoleController extends BackendController
     public function add()
     {
 
-        $role = new AdminRole();
-        $edit = new \Modules\Admin\View\Components\AdminRole\Listing\Edit();
+        $role = new Role();
+        $edit = new \Modules\Admin\View\Components\Role\Listing\Edit();
         $edit->row($role);
         $layout  = $this->layout();
         $content = $layout->child('content');
@@ -35,36 +35,35 @@ class RoleController extends BackendController
 
      public function save(Request $request){
         try{
-            $params = $request->post('role');
+            if($request->get('tab') == 'resource'){
+                $role = Role::findOrFail($request->id);
 
-            if($id = $request->get('id')){
-                $role = AdminRole::find($id);
-                if(!$role->id){
-                    throw new Exception("Invalid Request ID");
-                }
-                $role->update($params);
+                $resourceIds = $request->input('resources', []);
+
+                $role->resources()->sync($resourceIds);
+
+                return redirect()->to(urlx('admin.role.edit'))->with('success','Record saved');
             }
             else{
-                $role = AdminRole::create($params);
-            }
-            $params = $request->post('resource');
+                $params = $request->post('role');
 
-            AdminRoleResource::where('role_id', $role->id)->delete();
-            
-            if (!is_null($params) && isset($params['resource_id'])) {
-                $resourceIds = array_unique($params['resource_id']);
-                foreach ($resourceIds as $value) {
-                    AdminRoleResource::create([
-                        'role_id' => $role->id,
-                        'resource_id' => $value,
-                    ]);
+                if($id = $request->get('id')){
+                    $role = Role::find($id);
+                    if(!$role->id){
+                        throw new Exception("Invalid Request ID");
+                    }
+                    $role->update($params);
                 }
-            }
-            if($role->id){
-                return redirect()->route('admin.role.listing')->with('success','Record saved');
-            }
-            else{
-                throw new Exception('Something went wrong');
+                else{
+                    $role = Role::create($params);
+                }
+                
+                if($role->id){
+                    return redirect()->route('admin.role.listing')->with('success','Record saved');
+                }
+                else{
+                    throw new Exception('Something went wrong');
+                }
             }
         }
         catch(Exception $e){
@@ -75,12 +74,12 @@ class RoleController extends BackendController
     public function edit($id)
     {
         try{
-            $role = AdminRole::find($id);
+            $role = Role::find($id);
             if(!$role->id){
                 throw new Exception("Invalid Request");
             }
             
-            $edit = new \Modules\Admin\View\Components\AdminRole\Listing\Edit();
+            $edit = new \Modules\Admin\View\Components\Role\Listing\Edit();
             $edit->row($role);
             $layout  = $this->layout();
             $content = $layout->child('content');
@@ -95,7 +94,7 @@ class RoleController extends BackendController
     public function delete(Request $request){
         try{
 
-            $role = AdminRole::find($request->id);
+            $role = Role::find($request->id);
             if(!$role->id){
                 throw new Exception("Invalid Request");
             }
@@ -114,7 +113,7 @@ class RoleController extends BackendController
             if(is_null($ids)){
                 throw new Exception('Invalid Ids');
             }
-            AdminRole::destroy($ids);
+            Role::destroy($ids);
             return redirect()->route('admin.role.listing')->with('success','Records deleted');
         }
         catch (Exception $e){

@@ -1,7 +1,7 @@
 <?php
-namespace Modules\Admin\View\Components\AdminResource\Listing;
+namespace Modules\Admin\View\Components\Resource\Listing;
 
-use Modules\Admin\Models\AdminResource;
+use Modules\Admin\Models\Resource;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
 class Grid extends CoreGrid
 {
@@ -60,7 +60,7 @@ class Grid extends CoreGrid
     
     public function prepareCollection() 
     {
-        $resource = $this->model(AdminResource::class);
+        $resource = $this->model(Resource::class);
         $query = $resource->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());

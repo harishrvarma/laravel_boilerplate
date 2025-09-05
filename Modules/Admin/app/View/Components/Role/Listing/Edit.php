@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\Admin\View\Components\AdminRole\Listing;
+namespace Modules\Admin\View\Components\Role\Listing;
 
 use Modules\Core\View\Components\Listing\Edit as CoreEdit;
 
 class Edit extends CoreEdit
 {
-    protected $tabsClassName = '\Modules\Admin\View\Components\AdminRole\Listing\Edit\Tabs';
+    protected $tabsClassName = '\Modules\Admin\View\Components\Role\Listing\Edit\Tabs';
 
     public function __construct(){
         parent::__construct(); 
@@ -14,13 +14,15 @@ class Edit extends CoreEdit
     }
 
     public function prepareButtons(){
-        $this->button('save',[
-            'id' => 'saveBtn',
-            'name'=>'Save',
-            'class'=>'btn btn-primary',
-        ]);
+        if(canAccess('admin.role.save')){
+            $this->button('save',[
+                'id' => 'saveBtn',
+                'name'=>'Save',
+                'class'=>'btn btn-primary',
+            ]);
+        }
 
-         $this->button('back',[
+        $this->button('back',[
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',

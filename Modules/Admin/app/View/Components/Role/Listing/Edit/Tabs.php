@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Admin\View\Components\AdminResource\Listing\Edit;
+namespace Modules\Admin\View\Components\Role\Listing\Edit;
 
 use Modules\Core\View\Components\Listing\Edit\Tabs as CoreTabs;
 use Exception;
@@ -12,10 +12,15 @@ class Tabs extends CoreTabs
     }
 
     public function prepareTabs(){
+        $this->tab('role', [
+            'key' => 'role',
+            'title' => 'Role',
+            'tabClassName'=>'\Modules\Admin\View\Components\Role\Listing\Edit\Tabs\General',
+        ]);
         $this->tab('resource', [
             'key' => 'resource',
             'title' => 'Resource',
-            'tabClassName'=>'\Modules\Admin\View\Components\AdminResource\Listing\Edit\Tabs\General',
+            'tabClassName'=>'\Modules\Admin\View\Components\Role\Listing\Edit\Tabs\Resource',
         ]);
         return $this;
     }
