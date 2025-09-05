@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Modules\Admin\Models\Resource;
 use Nwidart\Modules\Traits\PathNamespace;
+use Illuminate\Support\Facades\Schema;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -30,6 +31,9 @@ class AdminServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
         $this->app->booted(function () {
+            if (!Schema::hasTable('admin_resource')) {
+                return;
+            }
             $routes = collect(\Route::getRoutes())
                 ->filter(function ($route) {
                     return str_starts_with($route->uri(), 'admin/');
