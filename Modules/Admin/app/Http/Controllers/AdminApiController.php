@@ -5,14 +5,14 @@ namespace Modules\Admin\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
-use Modules\Admin\Models\Admin;
+use Modules\Admin\Models\User;
 use Illuminate\Support\Facades\Hash;
  
 
 class AdminApiController extends Controller
 {
     public function listing(){
-        $admins = Admin::all();
+        $admins = User::all();
         return response()->json($admins);
     }
 
@@ -20,14 +20,14 @@ class AdminApiController extends Controller
         try{
             $params = $request->post('admin');
             if($id = $request->get('id')){
-                $admin = Admin::find($id);
+                $admin = User::find($id);
                 if(!$admin->id){
                     throw new Exception("Invalid Request ID");
                 }
                 $admin->update($params);
             }
             else{
-                $admin = Admin::create($params);
+                $admin = User::create($params);
             }
             if($admin->id){
                 return response()->json($admin);
@@ -43,7 +43,7 @@ class AdminApiController extends Controller
 
     public function delete(Request $request){
         try{
-            $admin = Admin::find($request->id);
+            $admin = User::find($request->id);
             if(!$admin->id){
                 throw new Exception("Invalid Request");
             }

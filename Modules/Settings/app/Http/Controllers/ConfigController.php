@@ -59,7 +59,6 @@ class ConfigController extends BackendController
     {
         try {
             $params = $request->post('config');
-    
             if ($id = $request->get('id')) {
                 $configGroup = ConfigGroup::find($id);
                 if (!$configGroup || !$configGroup->id) {

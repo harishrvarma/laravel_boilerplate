@@ -10,7 +10,7 @@ class Role extends Model
 
     public function admins()
     {
-        return $this->belongsToMany(Admin::class, 'admin_user_role', 'role_id', 'admin_id');
+        return $this->belongsToMany(User::class, 'admin_user_role', 'role_id', 'user_id');
     }
     public function resources()
     {

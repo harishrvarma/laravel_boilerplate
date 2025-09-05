@@ -49,9 +49,9 @@ return new class extends Migration {
             $table->foreignId('config_key_id')
                   ->constrained('config_keys')
                   ->onDelete('cascade');
-            $table->foreignId('admin_id')
+            $table->foreignId('user_id')
                   ->nullable()
-                  ->constrained('admin')
+                  ->constrained('admin_user')
                   ->onDelete('cascade');
             $table->text('value')->nullable();
             $table->timestamps();

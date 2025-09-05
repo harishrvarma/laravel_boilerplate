@@ -6,7 +6,6 @@ use Exception;
 Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
 use Modules\Admin\Models\Role;
-use Modules\Admin\Models\RoleResource;
 
 class RoleController extends BackendController
 {

@@ -5,7 +5,7 @@ namespace Modules\Events\Http\Controllers;
 use Exception;
 Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
-use Modules\Events\Models\Events;
+use Modules\Events\Models\Event;
 use Modules\Events\View\Components\Event\Listing\Edit;
 
 class EventsController extends BackendController
@@ -22,7 +22,7 @@ class EventsController extends BackendController
     public function add()
     {
 
-        $event = $this->model(Events::class);
+        $event = $this->model(Event::class);
         $edit =  $this->block(Edit::class);
         $edit->row($event);
         $layout  = $this->layout();
@@ -36,14 +36,14 @@ class EventsController extends BackendController
             $params = $request->post('event');
 
             if($id = $request->get('id')){
-                $event = Events::find($id);
+                $event = Event::find($id);
                 if(!$event->id){
                     throw new Exception("Invalid Request ID");
                 }
                 $event->update($params);
             }
             else{
-                $event = Events::create($params);
+                $event = Event::create($params);
             }
             if($event->id){
                 return redirect()->route('admin.event.listing')->with('success','Record saved');
@@ -61,7 +61,7 @@ class EventsController extends BackendController
     public function edit($id)
     {
         try{
-            $event = Events::find($id);
+            $event = Event::find($id);
             if(!$event->id){
                 throw new Exception("Invalid Request");
             }
@@ -80,7 +80,7 @@ class EventsController extends BackendController
     public function delete(Request $request){
         try{
 
-            $event = Events::find($request->id);
+            $event = Event::find($request->id);
             if(!$event->id){
                 throw new Exception("Invalid Request");
             }
@@ -99,7 +99,7 @@ class EventsController extends BackendController
             if(is_null($ids)){
                 throw new Exception('Invalid Ids');
             }
-            Events::destroy($ids);
+            Event::destroy($ids);
             return redirect()->route('admin.event.listing')->with('success','Records deleted');
         }
         catch (Exception $e){

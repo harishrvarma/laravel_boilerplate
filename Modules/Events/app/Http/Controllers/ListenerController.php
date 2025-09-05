@@ -5,7 +5,7 @@ namespace Modules\Events\Http\Controllers;
 use Exception;
 Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
-use Modules\Events\Models\Listener;
+use Modules\Events\Models\Event\Listener;
 use Modules\Events\View\Components\Listener\Listing\Edit;
 
 class ListenerController extends BackendController

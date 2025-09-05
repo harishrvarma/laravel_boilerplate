@@ -1,7 +1,7 @@
 <?php
 namespace Modules\Admin\View\Components\Admin\Listing;
 
-use Modules\Admin\Models\Admin;
+use Modules\Admin\Models\User;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
 class Grid extends CoreGrid
 {
@@ -120,7 +120,7 @@ class Grid extends CoreGrid
     
     public function prepareCollection() 
     {
-        $admin = $this->model(Admin::class);
+        $admin = $this->model(User::class);
         $query = $admin->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());

@@ -1,8 +1,9 @@
 <?php
 namespace Modules\Cron\View\Components\Cron\Listing;
 
-use Modules\Cron\Models\CronSchedule;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
+use Modules\Cron\Models\Cron;
+
 class Grid extends CoreGrid
 {
 
@@ -124,7 +125,7 @@ class Grid extends CoreGrid
     
     public function prepareCollection() 
     {
-        $admin = $this->model(CronSchedule::class);
+        $admin = $this->model(Cron::class);
         $query = $admin->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());

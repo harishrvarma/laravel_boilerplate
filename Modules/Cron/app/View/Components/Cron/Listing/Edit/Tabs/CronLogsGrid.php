@@ -1,9 +1,8 @@
 <?php
 namespace Modules\Cron\View\Components\Cron\Listing\Edit\Tabs;
 
-use Modules\Cron\Models\CronSchedule;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
-use Modules\Cron\Models\CronLog;
+use Modules\Cron\Models\Cron\Log;
 
 class CronLogsGrid extends CoreGrid
 {
@@ -56,14 +55,15 @@ class CronLogsGrid extends CoreGrid
 
     public function prepareCollection() 
     {
-        $admin = $this->model(CronLog::class);
+        $admin = $this->model(Log::class);
         $query = $admin->query();
-        $query->where('cron_schedule_id',request('id'));
+        $query->where('cron_id',request('id'));
         if($this->sortColumn() && $this->sortDir()){
-             $query->orderBy($this->sortColumn(), $this->sortDir());
+            $query->orderBy($this->sortColumn(), $this->sortDir());
         }
         $this->applyFilters($query);
         $this->pager($query);
+
         return $this;
     }
 }

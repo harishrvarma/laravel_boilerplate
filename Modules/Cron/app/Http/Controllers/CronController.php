@@ -5,7 +5,7 @@ namespace Modules\Cron\Http\Controllers;
 use Exception;
 Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
-use Modules\Cron\Models\CronSchedule;
+use Modules\Cron\Models\Cron;
 use Modules\Cron\View\Components\Cron\Listing\Edit;
 
 class CronController extends BackendController
@@ -21,7 +21,7 @@ class CronController extends BackendController
 
     public function add()
     {
-        $event = $this->model(CronSchedule::class);
+        $event = $this->model(Cron::class);
         $edit =  $this->block(Edit::class);
         $edit->row($event);
         $layout = $this->layout();
@@ -35,14 +35,14 @@ class CronController extends BackendController
             $params = $request->post('cron');
 
             if($id = $request->get('id')){
-                $event = CronSchedule::find($id);
+                $event = Cron::find($id);
                 if(!$event->id){
                     throw new Exception("Invalid Request ID");
                 }
                 $event->update($params);
             }
             else{
-                $event = CronSchedule::create($params);
+                $event = Cron::create($params);
             }
             if($event->id){
                 return redirect()->route('admin.cron.listing')->with('success','Record saved');
@@ -60,7 +60,7 @@ class CronController extends BackendController
     public function edit($id)
     {
         try{
-            $event = CronSchedule::find($id);
+            $event = Cron::find($id);
             if(!$event->id){
                 throw new Exception("Invalid Request");
             }
@@ -79,7 +79,7 @@ class CronController extends BackendController
     public function delete(Request $request){
         try{
 
-            $event = CronSchedule::find($request->id);
+            $event = Cron::find($request->id);
             if(!$event->id){
                 throw new Exception("Invalid Request");
             }
@@ -98,7 +98,7 @@ class CronController extends BackendController
             if(is_null($ids)){
                 throw new Exception('Invalid Ids');
             }
-            CronSchedule::destroy($ids);
+            Cron::destroy($ids);
             return redirect()->route('admin.core.listing')->with('success','Records deleted');
         }
         catch (Exception $e){

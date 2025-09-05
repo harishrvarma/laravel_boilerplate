@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('cron_schedules', function (Blueprint $table) {
+        Schema::create('cron', function (Blueprint $table) {
             $table->id();
             $table->string('name');                   
             $table->string('command');                
@@ -19,6 +19,6 @@ return new class extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists('cron_schedules');
+        Schema::dropIfExists('cron');
     }
 };

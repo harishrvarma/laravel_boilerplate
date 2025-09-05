@@ -5,9 +5,9 @@ namespace Modules\Admin\Http\Controllers;
 use Exception;
 Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
-use Modules\Admin\Models\Admin;
+use Modules\Admin\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Modules\Admin\Models\AdminRole;
+use Modules\Admin\Models\User\Role;
 use Modules\Admin\View\Components\Admin\Listing\Edit;
  
 
@@ -25,7 +25,7 @@ class AdminController extends BackendController
     public function add()
     {
 
-        $admin = $this->model(Admin::class);
+        $admin = $this->model(User::class);
         $edit =  $this->block(Edit::class);
         $edit->row($admin);
         $layout  = $this->layout();
@@ -42,24 +42,24 @@ class AdminController extends BackendController
             }
 
             if($id = $request->get('id')){
-                $admin = Admin::find($id);
+                $admin = User::find($id);
                 if(!$admin->id){
                     throw new Exception("Invalid Request ID");
                 }
                 $admin->update($params);
             }
             else{
-                $admin = Admin::create($params);
+                $admin = User::create($params);
             }
             $params = $request->post('role');
             
-            AdminRole::where('admin_id', $admin->id)->delete();
+            Role::where('user_id', $admin->id)->delete();
             
             if (!is_null($params) && isset($params['role_id'])) {
                 $resourceIds = array_unique($params['role_id']);
                 foreach ($resourceIds as $value) {
-                    AdminRole::create([
-                        'admin_id' => $admin->id,
+                    Role::create([
+                        'user_id' => $admin->id,
                         'role_id' => $value,
                     ]);
                 }
@@ -80,7 +80,7 @@ class AdminController extends BackendController
     public function edit($id)
     {
         try{
-            $admin = Admin::find($id);
+            $admin = User::find($id);
             if(!$admin->id){
                 throw new Exception("Invalid Request");
             }
@@ -99,7 +99,7 @@ class AdminController extends BackendController
     public function delete(Request $request){
         try{
 
-            $admin = Admin::find($request->id);
+            $admin = User::find($request->id);
             if(!$admin->id){
                 throw new Exception("Invalid Request");
             }
@@ -118,7 +118,7 @@ class AdminController extends BackendController
             if(is_null($ids)){
                 throw new Exception('Invalid Ids');
             }
-            Admin::destroy($ids);
+            User::destroy($ids);
             return redirect()->route('admin.admin.listing')->with('success','Records deleted');
         }
         catch (Exception $e){
