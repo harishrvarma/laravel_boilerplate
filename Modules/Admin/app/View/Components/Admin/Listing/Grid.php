@@ -14,11 +14,13 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        $this->column('mass_ids', [
-            'name'=>'id',
-            'label'=>'',
-            'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
-        ]);
+        if(canAccess('admin.admin.massDelete')){
+            $this->column('mass_ids', [
+                'name'=>'id',
+                'label'=>'',
+                'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
+            ]);
+        }
 
         $this->column('id', [
             'name'=>'id',
@@ -58,16 +60,20 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        $this->action('edit' , [
-            'id' => 'editBtn',
-            'title' => 'Edit',
-            'url' => 'admin.admin.edit'
-        ]);
-        $this->action('delete' , [
-            'id' => 'deleteBtn',
-            'title' => 'Delete',
-            'url' => 'admin.admin.delete'
-        ]);
+        if(canAccess('admin.admin.edit')){
+            $this->action('edit' , [
+                'id' => 'editBtn',
+                'title' => 'Edit',
+                'url' => 'admin.admin.edit'
+            ]);
+        }
+        if(canAccess('admin.admin.delete')){
+            $this->action('delete' , [
+                'id' => 'deleteBtn',
+                'title' => 'Delete',
+                'url' => 'admin.admin.delete'
+            ]);
+        }
         return $this;
     }
 
@@ -102,17 +108,14 @@ class Grid extends CoreGrid
     }
 
     public function prepareMassActions(){
-        parent::prepareMassActions();
-        $this->massAction('delete', [
-            'value'=>'mass_delete',
-            'label' =>'Delete Selected',
-            'url' => 'admin.admin.massDelete',
-        ]);
-        $this->massAction('export', [
-            'value'=>'mass_export',
-            'label' =>'Export Selected',
-            'url' => 'admin.admin.massExport',
-        ]);
+        if(canAccess('admin.admin.massDelete')){
+            parent::prepareMassActions();
+            $this->massAction('delete', [
+                'value'=>'mass_delete',
+                'label' =>'Delete Selected',
+                'url' => 'admin.admin.massDelete',
+            ]);
+        }
     }
     
     public function prepareCollection() 
@@ -129,10 +132,12 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        $this->button('add', [
-            'route' =>urlx('admin.admin.add',[],true),
-            'label' => 'Add Admin',
-        ]);
+        if(canAccess('admin.admin.add')){
+            $this->button('add', [
+                'route' =>urlx('admin.admin.add',[],true),
+                'label' => 'Add Admin',
+            ]);
+        }
         return $this;
     }
 }

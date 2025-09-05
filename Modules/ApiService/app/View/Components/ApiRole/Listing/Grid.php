@@ -13,12 +13,13 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        $this->column('mass_ids', [
-            'name'=>'id',
-            'label'=>'',
-            'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
-        ]);
-
+        if(canAccess('admin.apirole.massDelete')){
+            $this->column('mass_ids', [
+                'name'=>'id',
+                'label'=>'',
+                'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
+            ]);
+        }
         $this->column('id', [
             'name'=>'id',
             'label'=>'Id',
@@ -41,31 +42,32 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        $this->action('edit' , [
-            'id' => 'editBtn',
-            'title' => 'Edit',
-            'url' => 'admin.apirole.edit'
-        ]);
-        $this->action('delete' , [
-            'id' => 'deleteBtn',
-            'title' => 'Delete',
-            'url' => 'admin.apirole.delete'
-        ]);
+        if(canAccess('admin.apirole.edit')){
+            $this->action('edit' , [
+                'id' => 'editBtn',
+                'title' => 'Edit',
+                'url' => 'admin.apirole.edit'
+            ]);
+        }
+        if(canAccess('admin.apirole.delete')){
+            $this->action('delete' , [
+                'id' => 'deleteBtn',
+                'title' => 'Delete',
+                'url' => 'admin.apirole.delete'
+            ]);
+        }
         return $this;
     }
 
     public function prepareMassActions(){
-        parent::prepareMassActions();
-        $this->massAction('delete', [
-            'value'=>'mass_delete',
-            'label' =>'Delete Selected',
-            'url' => 'admin.apirole.massDelete',
-        ]);
-        $this->massAction('export', [
-            'value'=>'mass_export',
-            'label' =>'Export Selected',
-            'url' => 'admin.apirole.massExport',
-        ]);
+        if(canAccess('admin.apirole.massDelete')){
+            parent::prepareMassActions();
+            $this->massAction('delete', [
+                'value'=>'mass_delete',
+                'label' =>'Delete Selected',
+                'url' => 'admin.apirole.massDelete',
+            ]);
+        }
     }
 
     public function prepareFilters()
@@ -97,10 +99,12 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        $this->button('add', [
-            'route' =>urlx('admin.apirole.add',[],true),
-            'label' => 'Add Api Role',
-        ]);
+        if(canAccess('admin.apirole.add')){
+            $this->button('add', [
+                'route' =>urlx('admin.apirole.add',[],true),
+                'label' => 'Add Api Role',
+            ]);
+        }
         return $this;
     }
 }

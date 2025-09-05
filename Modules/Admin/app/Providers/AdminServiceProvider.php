@@ -2,9 +2,10 @@
 
 namespace Modules\Admin\Providers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Modules\Admin\Models\AdminResource;
+use Modules\Admin\Models\Resource;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -28,8 +29,13 @@ class AdminServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
-        $this->app->booted(function () use (&$routes) {
-             $this->syncAdminResources(\Route::getRoutes());
+        $this->app->booted(function () {
+            $routes = collect(\Route::getRoutes())
+                ->filter(function ($route) {
+                    return str_starts_with($route->uri(), 'admin/');
+                });
+        
+            $this->syncAdminResources($routes);
         });
     }
 
@@ -180,47 +186,53 @@ class AdminServiceProvider extends ServiceProvider
         }
     
         // Deactivate removed routes
-        AdminResource::whereNotIn('code', $newCodes)->update(['status' => '0']);
+        Resource::whereNotIn('code', $newCodes)->update(['status' => '0']);
     }
 
     public function createResourceTree($route)
     {
         $routeName = $route->getName();
         $parts = explode('.', $routeName);
-
+    
         if ($parts[0] !== 'admin') {
             return;
         }
-
+    
         $parentId = null;
         $code = '';
         $pathIds = '';
+    
         foreach ($parts as $level => $part) {
             $code = $code ? $code . '.' . $part : $part;
-    
             $isLast = $level + 1 === count($parts);
-
-        // 👇 For `name` we always take the last part
-            $name = $isLast ? ucfirst(str_replace('_', ' ', $part)) : null;
-            // Try to pick a label for each part
-            $label = $route->defaults['label'] ?? ucfirst($part) ?? $routeName;
     
-            $resource = AdminResource::updateOrCreate(
+            // 👉 Name: only for last part
+            $name = $isLast ? ucfirst(str_replace('_', ' ', $part)) : null;
+    
+            // 👉 Label: if route ends with ".*", take the part before "*"
+            if (!$isLast) {
+                $label = ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part));
+            } else {
+                $label = $route->defaults['label'] ?? ucfirst(str_replace('_', ' ', $part)) ?? $routeName;
+            }
+    
+            $resource = Resource::updateOrCreate(
                 ['code' => $code],
                 [
-                    'name'       => $isLast ? $name : $resource->name ?? ucfirst($part),
+                    'name'       => $isLast ? $name : ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part)),
                     'label'      => $label,
-                    'route_name' => $level + 1 === count($parts) ? $routeName : $code . '.*',
+                    'route_name' => $isLast ? $routeName : $code . '.*',
                     'uri'        => $isLast ? $route->uri() : null,
-                    'method'     => $level + 1 === count($parts) ? implode('|', $route->methods()) : 'ANY',
+                    'method'     => $isLast ? implode('|', $route->methods()) : 'ANY',
                     'level'      => $level + 1,
                     'parent_id'  => $parentId,
                     'status'     => '1',
                 ]
             );
     
+            // Path_ids build
             $pathIds = $parentId
-                ? AdminResource::find($parentId)->path_ids . $resource->id . '/'
+                ? Resource::find($parentId)->path_ids . $resource->id . '/'
                 : '/' . $resource->id . '/';
     
             $resource->update([

@@ -5,10 +5,11 @@ use Modules\ApiService\Http\Controllers\ApiUserController;
 use Modules\Admin\Http\Middleware\AdminAuthenticate;
 use Modules\ApiService\Http\Controllers\ApiResourceController;
 use Modules\ApiService\Http\Controllers\ApiRoleController;
+use Modules\Admin\Http\Middleware\AdminPermission;
 
 Route::prefix('admin')->group(function(){
     
-    Route::middleware(AdminAuthenticate::class)->group(function () {
+    Route::middleware([AdminAuthenticate::class,AdminPermission::class])->group(function () {
         Route::match(['GET','POST'], '/apiuser/listing', [ApiUserController::class,'listing'])
         ->name('admin.apiuser.listing')->defaults('label', 'Api User Listing');
         Route::get('/apiuser/add', [ApiUserController::class,'add'])->name('admin.apiuser.add')->defaults('label', 'Add Api User');

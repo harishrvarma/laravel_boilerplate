@@ -5,7 +5,7 @@ namespace Modules\Admin\Http\Controllers;
 use Exception;
 Use Modules\Core\Http\Controllers\BackendController;
 use Illuminate\Http\Request;
-use Modules\Admin\Models\AdminResource;
+use Modules\Admin\Models\Resource;
 
 class ResourceController extends BackendController
 {
@@ -13,7 +13,7 @@ class ResourceController extends BackendController
      public function listing(Request $request)
     {
         
-        $listing = new \Modules\Admin\View\Components\AdminResource\Listing();
+        $listing = new \Modules\Admin\View\Components\Resource\Listing();
         $layout = $this->layout();
         $content = $layout->child('content');
         $content->child('listing',$listing);
@@ -23,8 +23,8 @@ class ResourceController extends BackendController
     public function add()
     {
 
-        $resource = new AdminResource();
-        $edit = new \Modules\Admin\View\Components\AdminResource\Listing\Edit();
+        $resource = new Resource();
+        $edit = new \Modules\Admin\View\Components\Resource\Listing\Edit();
         $edit->row($resource);
         $layout  = $this->layout();
         $content = $layout->child('content');
@@ -37,14 +37,14 @@ class ResourceController extends BackendController
             $params = $request->post('resource');
 
             if($id = $request->get('id')){
-                $resource = AdminResource::find($id);
+                $resource = Resource::find($id);
                 if(!$resource->id){
                     throw new Exception("Invalid Request ID");
                 }
                 $resource->update($params);
             }
             else{
-                $resource = AdminResource::create($params);
+                $resource = Resource::create($params);
             }
             if($resource->id){
                 return redirect()->route('admin.resource.listing')->with('success','Record saved');
@@ -61,12 +61,12 @@ class ResourceController extends BackendController
     public function edit($id)
     {
         try{
-            $resource = AdminResource::find($id);
+            $resource = Resource::find($id);
             if(!$resource->id){
                 throw new Exception("Invalid Request");
             }
             
-            $edit = new \Modules\Admin\View\Components\AdminResource\Listing\Edit();
+            $edit = new \Modules\Admin\View\Components\Resource\Listing\Edit();
             $edit->row($resource);
             $layout  = $this->layout();
             $content = $layout->child('content');
@@ -81,7 +81,7 @@ class ResourceController extends BackendController
     public function delete(Request $request){
         try{
 
-            $resource = AdminResource::find($request->id);
+            $resource = Resource::find($request->id);
             if(!$resource->id){
                 throw new Exception("Invalid Request");
             }
@@ -100,7 +100,7 @@ class ResourceController extends BackendController
             if(is_null($ids)){
                 throw new Exception('Invalid Ids');
             }
-            AdminResource::destroy($ids);
+            Resource::destroy($ids);
             return redirect()->route('admin.resource.listing')->with('success','Records deleted');
         }
         catch (Exception $e){

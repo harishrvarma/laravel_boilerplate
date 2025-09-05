@@ -13,12 +13,6 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        $this->column('mass_ids', [
-            'name'=>'id',
-            'label'=>'',
-            'columnClassName'=>'\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
-        ]);
-
         $this->column('id', [
             'name'=>'id',
             'label'=>'Id',
@@ -39,34 +33,6 @@ class Grid extends CoreGrid
         return $this;
     }
 
-    public function prepareActions()
-    {
-        $this->action('edit' , [
-            'id' => 'editBtn',
-            'title' => 'Edit',
-            'url' => 'admin.apiresource.edit'
-        ]);
-        $this->action('delete' , [
-            'id' => 'deleteBtn',
-            'title' => 'Delete',
-            'url' => 'admin.apiresource.delete'
-        ]);
-        return $this;
-    }
-
-    public function prepareMassActions(){
-        parent::prepareMassActions();
-        $this->massAction('delete', [
-            'value'=>'mass_delete',
-            'label' =>'Delete Selected',
-            'url' => 'admin.apiresource.massDelete',
-        ]);
-        $this->massAction('export', [
-            'value'=>'mass_export',
-            'label' =>'Export Selected',
-            'url' => 'admin.apiresource.massExport',
-        ]);
-    }
 
     public function prepareFilters()
     {
@@ -95,12 +61,4 @@ class Grid extends CoreGrid
         return $this;
     }
 
-    public function prepareButtons()
-    {
-        $this->button('add', [
-            'route' =>urlx('admin.apiresource.add',[],true),
-            'label' => 'Add Api Resource',
-        ]);
-        return $this;
-    }
 }

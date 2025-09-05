@@ -17,12 +17,14 @@ class Tabs extends CoreTabs
             'title' => 'Event',
             'tabClassName'=>'\Modules\Events\View\Components\Event\Listing\Edit\Tabs\General',
         ]);
-        if(request('id')){
-            $this->tab('listener', [
-                'key' => 'listener',
-                'title' => 'Listener',
-                'tabClassName'=>'\Modules\Events\View\Components\Event\Listing\Edit\Tabs\ListenerGrid',
-            ]);
+        if(canAccess('admin.listener.listing')){
+            if(request('id')){
+                $this->tab('listener', [
+                    'key' => 'listener',
+                    'title' => 'Listener',
+                    'tabClassName'=>'\Modules\Events\View\Components\Event\Listing\Edit\Tabs\ListenerGrid',
+                ]);
+            }
         }
         return $this;
     }

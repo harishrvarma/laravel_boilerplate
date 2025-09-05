@@ -3,10 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Settings\Http\Controllers\ConfigController;
 use Modules\Admin\Http\Middleware\AdminAuthenticate;
+use Modules\Admin\Http\Middleware\AdminPermission;
+
 
 Route::prefix('admin')->group(function(){
     
-    Route::middleware(AdminAuthenticate::class)->group(function () {
+    Route::middleware([AdminAuthenticate::class,AdminPermission::class])->group(function () {
 
         Route::match(['GET','POST'], '/config/listing', [ConfigController::class,'listing'])
         ->name('admin.config.listing')->defaults('label', 'Config Listing');

@@ -3,11 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Cron\Http\Controllers\CronController;
 use Modules\Admin\Http\Middleware\AdminAuthenticate;
-
-
+use Modules\Admin\Http\Middleware\AdminPermission;
 
 Route::prefix('admin')->group(function(){
-    Route::middleware(AdminAuthenticate::class)->group(function () {
+    Route::middleware([AdminAuthenticate::class,AdminPermission::class])->group(function () {
         Route::match(['GET','POST'], '/cron/listing', [CronController::class,'listing'])
         ->name('admin.cron.listing')->defaults('label', 'Cron Listing');
         Route::get('/cron/add', [CronController::class,'add'])->name('admin.cron.add')->defaults('label', 'Add Cron');

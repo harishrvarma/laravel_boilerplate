@@ -14,12 +14,13 @@ class Edit extends CoreEdit
     }
 
     public function prepareButtons(){
-        $this->button('save',[
-            'id' => 'saveBtn',
-            'name'=>'Save',
-            'class'=>'btn btn-primary',
-        ]);
-
+        if(canAccess('admin.config.save')){
+            $this->button('save',[
+                'id' => 'saveBtn',
+                'name'=>'Save',
+                'class'=>'btn btn-primary',
+            ]);
+        }
          $this->button('back',[
             'id' => 'backBtn',
             'name'=>'Back',
