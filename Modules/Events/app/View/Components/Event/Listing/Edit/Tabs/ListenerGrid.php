@@ -1,9 +1,8 @@
 <?php
 namespace Modules\Events\View\Components\Event\Listing\Edit\Tabs;
 
-use Modules\Events\Models\Events;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
-use Modules\Events\Models\Listener;
+use Modules\Events\Models\Event\Listener;
 
 class ListenerGrid extends CoreGrid
 {

@@ -1,8 +1,9 @@
 <?php
 namespace Modules\Events\View\Components\Event\Listing;
 
-use Modules\Events\Models\Events;
 use Modules\Core\View\Components\Listing\Grid as CoreGrid;
+use Modules\Events\Models\Event;
+
 class Grid extends CoreGrid
 {
     public function __construct()
@@ -91,7 +92,7 @@ class Grid extends CoreGrid
     
     public function prepareCollection() 
     {
-        $admin = $this->model(Events::class);
+        $admin = $this->model(Event::class);
         $query = $admin->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());

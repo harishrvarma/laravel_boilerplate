@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
-        Schema::create('listeners', function (Blueprint $table) {
+        Schema::create('event_listerner', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('event_id');
             $table->string('name', 150);
@@ -15,11 +15,11 @@ return new class extends Migration {
             $table->boolean('status')->default(1);
             $table->timestamps();
 
-            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+            $table->foreign('event_id')->references('id')->on('event')->onDelete('cascade');
         });
     }
 
     public function down(): void {
-        Schema::dropIfExists('listeners');
+        Schema::dropIfExists('event_listerner');
     }
 };

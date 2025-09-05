@@ -3,7 +3,7 @@
 namespace Modules\Admin\View\Components\Role\Listing\Edit\Tabs;
 
 use Modules\Admin\Models\Resource as ModelResource;
-use Modules\Admin\Models\RoleResource;
+use Modules\Admin\Models\Role\Resource as RoleResource;
 use Modules\Core\View\Components\Block;
 
 class Resource extends Block

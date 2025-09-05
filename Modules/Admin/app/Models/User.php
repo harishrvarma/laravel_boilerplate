@@ -3,10 +3,11 @@
 namespace Modules\Admin\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
+use Modules\Admin\Models\User\Role as AdminRole;
 
-class Admin extends Authenticatable
+class User extends Authenticatable
 {
-    protected $table = 'admin';
+    protected $table = 'admin_user';
     protected $fillable = ['first_name','username','status','email','password','last_name'];
 
     protected $hidden = [
@@ -31,12 +32,12 @@ class Admin extends Authenticatable
 
     public function role()
     {
-        return $this->belongsToMany(Role::class, 'admin_user_role', 'admin_id', 'role_id');
+        return $this->belongsToMany(Role::class, 'admin_user_role', 'user_id', 'role_id');
     }
 
     public function roles()
     {
-        return $this->hasMany(AdminRole::class, 'admin_id',);
+        return $this->hasMany(AdminRole::class, 'user_id');
     }
  
     public function hasAccess($resourceCode)
