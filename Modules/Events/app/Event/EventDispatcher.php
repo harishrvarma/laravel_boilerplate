@@ -1,13 +1,13 @@
 <?php
 namespace Modules\Events\Event;
 
-use Modules\Events\Models\Events;
+use Modules\Events\Models\Event;
 
 class EventDispatcher
 {
     public function dispatch(string $eventCode, $payload = [])
     {
-        $event = Events::where('code', $eventCode)->where('status', 1)->first();
+        $event = Event::where('code', $eventCode)->where('status', 1)->first();
 
         if (! $event) {
             return false;

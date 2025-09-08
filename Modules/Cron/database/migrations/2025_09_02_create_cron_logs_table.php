@@ -8,7 +8,7 @@ return new class extends Migration {
     {
         Schema::create('cron_log', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cron_id')->constrained()->onDelete('cascade');
+            $table->foreignId('cron_id')->constrained('cron')->onDelete('cascade');
             $table->enum('status', ['success', 'failed'])->default('success');
             $table->text('message')->nullable();      // Log message or error
             $table->timestamp('started_at')->nullable();
