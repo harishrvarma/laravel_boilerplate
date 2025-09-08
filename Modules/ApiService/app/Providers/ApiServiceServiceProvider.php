@@ -5,8 +5,6 @@ namespace Modules\ApiService\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
-use Illuminate\Support\Facades\Schema;
-use Modules\ApiService\Models\ApiResource;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -29,16 +27,6 @@ class ApiServiceServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
-        $this->app->booted(function () {
-            if (!Schema::hasTable('api_resource') || !Schema::hasColumn('api_resource', 'route_name')) {
-                return;
-            }
-            $routes = collect(\Route::getRoutes())
-                ->filter(function ($route) {
-                    return str_starts_with($route->uri(), 'api/');
-                });
-            $this->syncApiResources($routes);
-        });
     }
 
     /**
@@ -162,83 +150,5 @@ class ApiServiceServiceProvider extends ServiceProvider
         }
 
         return $paths;
-    }
-
-    public function syncApiResources($routes)
-    {
-        // Get only admin routes with a name
-        $apiRoutes = collect($routes)->filter(function ($route) {
-            return str_starts_with($route->uri(), 'api/') && $route->getName();
-        });
-    
-        $newCodes = [];
-    
-        foreach ($apiRoutes as $route) {
-            $code = $route->getName();
-
-            $newCodes[] = $code;
-    
-            $this->createResourceTree($route);
-            
-        }
-    
-        // Deactivate removed routes
-        ApiResource::whereNotIn('code', $newCodes)->update(['status' => '0']);
-    }
-
-    public function createResourceTree($route)
-    {
-        $routeName = $route->getName();
-        $parts = explode('.', $routeName);
-    
-        if ($parts[0] !== 'api') {
-            return;
-        }
-    
-        $parentId = null;
-        $code = '';
-        $pathIds = '';
-    
-        foreach ($parts as $level => $part) {
-            $code = $code ? $code . '.' . $part : $part;
-            $isLast = $level + 1 === count($parts);
-    
-            // 👉 Name: only for last part
-            $name = $isLast ? ucfirst(str_replace('_', ' ', $part)) : null;
-    
-            // 👉 Label: if route ends with ".*", take the part before "*"
-            if (!$isLast) {
-                $label = ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part));
-            } else {
-                $label = $route->defaults['label'] ?? ucfirst(str_replace('_', ' ', $part)) ?? $routeName;
-            }
-    
-            $resource = ApiResource::updateOrCreate(
-                ['code' => $code],
-                [
-                    'name'       => $isLast ? $name : ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part)),
-                    'label'      => $label,
-                    'route_name' => $isLast ? $routeName : $code . '.*',
-                    'uri'        => $isLast ? $route->uri() : null,
-                    'method'     => $isLast ? implode('|', $route->methods()) : 'ANY',
-                    'level'      => $level + 1,
-                    'parent_id'  => $parentId,
-                    'status'     => '1',
-                ]
-            );
-    
-            // Path_ids build
-            $pathIds = $parentId
-                ? ApiResource::find($parentId)->path_ids . $resource->id . '/'
-                : '/' . $resource->id . '/';
-    
-            $resource->update([
-                'path_ids'  => $pathIds,
-                'parent_id' => $parentId,
-                'level'     => $level + 1,
-            ]);
-    
-            $parentId = $resource->id;
-        }
     }
 }
