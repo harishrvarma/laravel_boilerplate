@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Schema;
 use Modules\Api\Models\ApiResource;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Laravel\Passport\Passport;
+use Illuminate\Routing\Router;
+use Laravel\Passport\Http\Middleware\CheckTokenForAnyScope;
+use Laravel\Passport\Http\Middleware\CheckToken;
 
 class ApiServiceProvider extends ServiceProvider
 {
@@ -29,6 +33,9 @@ class ApiServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('scope', CheckTokenForAnyScope::class);
+        $router->aliasMiddleware('scopes', CheckToken::class);
         $this->app->booted(function () {
             if (!Schema::hasTable('api_resource') || !Schema::hasColumn('api_resource', 'route_name')) {
                 return;
@@ -38,6 +45,12 @@ class ApiServiceProvider extends ServiceProvider
                     return str_starts_with($route->uri(), 'api/');
                 });
             $this->syncApiResources($routes);
+
+            $resources = ApiResource::pluck('name','code')
+            ->reject(fn($name, $code) => empty($code) || $code === 'api.')
+            ->toArray();
+    
+            Passport::tokensCan($resources);
         });
     }
 
@@ -166,7 +179,6 @@ class ApiServiceProvider extends ServiceProvider
 
     public function syncApiResources($routes)
     {
-        // Get only admin routes with a name
         $apiRoutes = collect($routes)->filter(function ($route) {
             return str_starts_with($route->uri(), 'api/') && $route->getName();
         });
@@ -174,15 +186,12 @@ class ApiServiceProvider extends ServiceProvider
         $newCodes = [];
         foreach ($apiRoutes as $route) {
             $code = $route->getName();
-
-            if (!empty($code)) {
+    
+            if (!empty($code) && $code !== 'api.') {
                 $newCodes[] = $code;
                 $this->createResourceTree($route);
             }
-            
         }
-    
-        // Deactivate removed routes
         ApiResource::whereNotIn('code', $newCodes)->update(['status' => '0']);
     }
 

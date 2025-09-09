@@ -13,9 +13,5 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Passport::routes();
-
-        $resources = ApiResource::pluck('name','code')->toArray();
-
-        Passport::tokensCan($resources);
     }
 }
