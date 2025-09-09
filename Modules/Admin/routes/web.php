@@ -33,10 +33,9 @@ Route::prefix('admin')->group(function(){
         ->name('admin.resource.listing')->defaults('label', 'Admin Resource Listing');
     });
     
+    Route::middleware('guest')->group(function () {
+        Route::get('login', [LoginController::class, 'index'])->name('admin.login');
+        Route::post('post', [LoginController::class, 'post'])->name('admin.login.post');
+        Route::post('logout', [LoginController::class, 'logout'])->name('admin.logout');
+    });
 });
-Route::middleware('guest')->group(function () {
-    Route::get('login', [LoginController::class, 'index'])->name('admin.login');
-    Route::post('post', [LoginController::class, 'post'])->name('admin.login.post');
-    Route::post('logout', [LoginController::class, 'logout'])->name('admin.logout');
-});
-

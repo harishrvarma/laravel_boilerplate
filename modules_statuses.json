@@ -5,5 +5,5 @@
     "Settings": true,
     "Events": true,
     "Cron": true,
-    "ApiService": true
+    "Api": true
 }
