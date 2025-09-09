@@ -70,7 +70,7 @@ return [
         ],
         'apiuser' => [
             'driver' => 'eloquent',
-            'model' => Modules\ApiService\Models\ApiUser::class,
+            'model' => Modules\Api\Models\ApiUser::class,
         ],
     ],
 

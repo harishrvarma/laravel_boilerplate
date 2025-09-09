@@ -1,9 +1,8 @@
 <div class="d-flex justify-content-end align-items-center flex-wrap gap-2 mb-3 p-2"></div>
-<div class="card shadow-sm">
-    <div class="card-header d-flex align-items-center">
-        <h5 class="mb-0">{{ $me->title() }}</h5>
+<div class="col-sm-6">
+        <h2 class="mb-3">{{ $me->title() }}</h2>
     </div>
-
+<div class="card shadow-sm">
     <form action="{{ $me->saveUrl() }}" method="post">
         @csrf
         @if($tabs = $me->getTabsBlock())
