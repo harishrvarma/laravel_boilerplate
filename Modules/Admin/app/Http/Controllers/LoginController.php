@@ -14,6 +14,9 @@ class LoginController extends BackendController
      */
     public function index(Request $request)
     {
+        if (\Auth::guard('admin')->check()) {
+            return redirect()->route('admin.admin.listing');
+        }
         $layout = $this->layout();
         $layout->template('admin::components.admin.layout.blank');
         $content = $layout->child('content');
@@ -47,7 +50,7 @@ class LoginController extends BackendController
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('admin')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
