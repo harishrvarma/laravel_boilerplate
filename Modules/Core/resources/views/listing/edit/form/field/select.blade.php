@@ -4,10 +4,13 @@
 
     if ($relation && method_exists($row, $relation)) {
         $selectedValues = $row->{$relation}()->pluck($valueKey)->toArray() ?? [];
+    } elseif (!empty($field['selected'])) {
+        $selectedValues = is_array($field['selected']) ? $field['selected'] : [$field['selected']];
     } else {
         $selectedValues = $row->$valueKey ? [$row->$valueKey] : [];
     }
 @endphp
+
 
 <div class="mb-3">
     <label for="{{ $field['id'] }}" class="form-label">
@@ -21,12 +24,13 @@
         @if(!empty($field['multiselect'])) multiple @endif
         data-placeholder="{{ $field['placeholder'] ?? 'Select option(s)' }}"
     >
-        @foreach(($field['options'] ?? []) as $key => $option)
-            <option value="{{ $key }}"
-                {{ old($field['name'], in_array($key, $selectedValues)) ? 'selected' : '' }}>
-                {{ $option }}
-            </option>
-        @endforeach
+    @foreach(($field['options'] ?? []) as $key => $option)
+    <option value="{{ $key }}"
+        {{ in_array($key, $selectedValues) ? 'selected' : '' }}>
+        {{ $option }}
+    </option>
+@endforeach
+
     </select>
 
     @error($field['name'])
@@ -53,6 +57,22 @@ $(function () {
             return data.text;
         }
     });
+
+    let $inputType    = $("#input_type");
+    let $optionsField = $(".settings-options");
+
+    function toggleOptions() {
+        let needsOptions = ["select", "radio", "checkbox"];
+        if (needsOptions.includes($inputType.val())) {
+            $optionsField.removeClass("d-none");
+        } else {
+            $optionsField.addClass("d-none");
+        }
+    }
+
+    toggleOptions();
+    $inputType.on("change", toggleOptions);
 });
+
 </script>
 @endpush
