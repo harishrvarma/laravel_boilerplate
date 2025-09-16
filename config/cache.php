@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    'default' => env('CACHE_STORE', 'file'),
 
     /*
     |--------------------------------------------------------------------------
@@ -88,6 +88,26 @@ return [
 
         'octane' => [
             'driver' => 'octane',
+        ],
+
+        'translations' => [
+            'driver' => 'file',
+            'path'   => storage_path('framework/cache/translations'),
+        ],
+
+        'global' => [
+            'driver' => 'file',
+            'path'   => storage_path('framework/cache/global'),
+        ],
+
+        'area' => [
+            'driver' => 'file',
+            'path'   => storage_path('framework/cache/area'),
+        ],
+
+        'module' => [
+            'driver' => 'file',
+            'path'   => storage_path('framework/cache/module'),
         ],
 
     ],
