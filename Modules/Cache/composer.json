@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/cache",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Cache\\": "app/",
+            "Modules\\Cache\\Database\\Factories\\": "database/factories/",
+            "Modules\\Cache\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Cache\\Tests\\": "tests/"
+        }
+    }
+}
