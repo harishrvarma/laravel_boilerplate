@@ -25,7 +25,7 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . route('admin.config.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.config.listing',['tab'=> 1], true) . "'",
         ]);
         return $this;
     }

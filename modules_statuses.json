@@ -5,5 +5,8 @@
     "Settings": true,
     "Events": true,
     "Cron": true,
-    "Api": true
+    "Api": true,
+    "Translation": true,
+    "Cache": true,
+    "Menu": true
 }

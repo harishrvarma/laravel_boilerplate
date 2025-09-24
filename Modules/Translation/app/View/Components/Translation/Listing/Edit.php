@@ -1,39 +1,40 @@
 <?php
 
-namespace Modules\Settings\View\Components\Listing;
+namespace Modules\Translation\View\Components\Translation\Listing;
 
 use Modules\Core\View\Components\Listing\Edit as CoreEdit;
 
-class EditFields extends CoreEdit
+class Edit extends CoreEdit
 {
-    protected $tabsClassName = 'Modules\Settings\View\Components\Listing\Edit\FieldTabs';
+    protected $tabsClassName = 'Modules\Translation\View\Components\Translation\Listing\Edit\Tabs';
 
     public function __construct(){
         parent::__construct();
-        $this->title('Add Fields');
+        $this->title('Add/Edit Translation');
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.config.saveFields')){
+        if(canAccess('admin.translation.save')){
             $this->button('save',[
                 'id' => 'saveBtn',
                 'name'=>'Save',
                 'class'=>'btn btn-primary',
             ]);
         }
+
          $this->button('back',[
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.config.listing',['tab'=> 1], true) . "'",
+            'method' => "window.location.href='" . urlx('admin.translation.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->id){
-            return  urlx('admin.config.saveFields',['id'=>$this->row()->id]);
+            return urlx('admin.translation.save',['id'=>$this->row()->id]);
         }
-        return  urlx('admin.config.saveFields');
+        return urlx('admin.translation.save');
     }
 }

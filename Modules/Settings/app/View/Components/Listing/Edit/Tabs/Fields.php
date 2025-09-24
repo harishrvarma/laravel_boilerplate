@@ -47,6 +47,15 @@ class Fields extends CoreForm
             ],
         ]);
 
+        $this->field('options', [
+            'id'    => 'options',
+            'name'  => 'config[options]',
+            'label' => 'Options',
+            'type'  => 'textarea',
+            'note'  => 'Enter options (one per line, format: value|label)',
+            'class' => 'd-none settings-options',
+        ]);
+
         // Is Required
         $this->field('is_required', [
             'id'    => 'is_required',

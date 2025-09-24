@@ -89,22 +89,23 @@ class ConfigController extends BackendController
         try {
             $params = $request->post('config');
             $tab = $request->get('activeTab');
-
+    
             if (!$tab) {
                 throw new \Exception('Invalid Config Group');
             }
-
+    
             $group = ConfigGroup::where('id', $tab)->first();
             if (!$group) {
                 throw new \Exception("Config Group '{$tab}' not found");
             }
-
+    
+            // Save or update ConfigKey
             if ($id = $request->get('id')) {
                 $configKey = ConfigKey::find($id);
                 if (!$configKey || !$configKey->id) {
                     throw new \Exception("Invalid Config Key ID");
                 }
-
+    
                 $configKey->update([
                     'key_name'      => $params['key_name'] ?? $configKey->key_name,
                     'label'         => $params['label'] ?? $configKey->label,
@@ -121,14 +122,53 @@ class ConfigController extends BackendController
                     'default_value' => $params['default_value'] ?? null,
                 ]);
             }
-
+    
             if ($configKey && $configKey->id) {
                 $configKey->groups()->syncWithoutDetaching([$group->id]);
+    
+                if (!empty($params['options']) && in_array($params['input_type'], ['select','radio','checkbox'])) {
+    
+                    $lines = preg_split("/\r\n|\n|\r/", $params['options']);
+                    $position = 1;
+                    $currentOptionValues = [];
+    
+                    foreach ($lines as $line) {
+                        if (trim($line) === '') continue;
+    
+                        if (strpos($line, '=>') !== false) {
+                            [$value, $label] = array_map('trim', explode('=>', $line, 2));
+                        } else {
+                            [$value, $label] = array_map('trim', explode('|', $line, 2));
+                        }
+    
+                        $currentOptionValues[] = $value;
+    
+                        $option = $configKey->options()->where('option_value', $value)->first();
+                        if ($option) {
+                            $option->update([
+                                'option_label' => $label ?? $value,
+                                'position'     => $position,
+                                'is_default'   => ($params['default_value'] ?? null) == $value ? 1 : 0,
+                            ]);
+                        } else {
+                            $configKey->options()->create([
+                                'option_value' => $value,
+                                'option_label' => $label ?? $value,
+                                'position'     => $position,
+                                'is_default'   => ($params['default_value'] ?? null) == $value ? 1 : 0,
+                            ]);
+                        }
+    
+                        $position++;
+                    }
+    
+                    // Remove options that are no longer in textarea
+                    $configKey->options()->whereNotIn('option_value', $currentOptionValues)->delete();
+                }
             }
-
-            return redirect()
-                ->to(urlx('admin.config.listing', ['tab' => $tab],true));
-
+    
+            return redirect()->to(urlx('admin.config.listing', ['tab' => $tab], true));
+    
         } catch (\Exception $e) {
             return redirect()
                 ->back()
@@ -136,6 +176,7 @@ class ConfigController extends BackendController
                 ->with('error', $e->getMessage());
         }
     }
+    
 
     public function saveConfig(Request $request)
     {

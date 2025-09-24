@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('translations', function (Blueprint $table) {
+            $table->id();
+            $table->string('module', 50)->nullable();
+            $table->string('locale', 10);
+            $table->string('group', 50);
+            $table->string('key', 191);
+            $table->text('value');
+            $table->timestamps();
+
+            $table->unique(['module','locale','group','key']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('translations');
+    }
+};
