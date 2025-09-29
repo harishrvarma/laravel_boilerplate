@@ -1,0 +1,60 @@
+{
+  "base_path": "__DIR__/",
+  "module": "Catalog",
+  "tables": [
+    {
+      "name": "product",
+      "primary_key": "product_id",
+      "fields": [
+        { "name": "product_id", "type": "int", "primary": true },
+        { "name": "name", "type": "string" },
+        { "name": "description", "type": "string", "nullable": true },
+        { "name": "price", "type": "decimal", "nullable": true },
+        { "name": "stock", "type": "int", "nullable": true },
+        { "name": "created_at", "type": "datetime", "nullable": true },
+        { "name": "updated_at", "type": "datetime", "nullable": true }
+      ],
+      "path_mode": "nested",
+      "ignore_module_prefix": true
+    },
+    {
+      "name": "product_category",
+      "primary_key": "category_id",
+      "fields": [
+        { "name": "category_id", "type": "int", "primary": true },
+        { "name": "product_id", "type": "int" },
+        { "name": "category_name", "type": "string", "nullable": true },
+        { "name": "category_description", "type": "string", "nullable": true },
+        { "name": "category_parent_id", "type": "int", "nullable": true },
+        { "name": "created_at", "type": "datetime", "nullable": true },
+        { "name": "updated_at", "type": "datetime", "nullable": true }
+      ],
+      "path_mode": "nested",
+      "ignore_module_prefix": true
+    },
+    {
+      "name": "product_category_type",
+      "primary_key": "category_type_id",
+      "fields": [
+        { "name": "category_type_id", "type": "int", "primary": true },
+        { "name": "category_id", "type": "int" },
+        { "name": "category_type_name", "type": "string", "nullable": true },
+        { "name": "category_type_description", "type": "string", "nullable": true },
+        { "name": "status", "type": "int", "nullable": true },
+        { "name": "created_at", "type": "datetime", "nullable": true },
+        { "name": "updated_at", "type": "datetime", "nullable": true }
+      ],
+      "path_mode": "nested",
+      "ignore_module_prefix": true
+    }
+  ],
+  "generate": {
+    "controller": true,
+    "model": true,
+    "blocks": true,
+    "routes": true,
+    "migration": true,
+    "config": true,
+    "seeder": true
+  }
+}

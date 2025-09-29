@@ -9,107 +9,113 @@ use Modules\Admin\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Modules\Admin\Models\User\Role;
 use Modules\Admin\View\Components\Admin\Listing\Edit;
+use Modules\Admin\View\Components\Admin\Listing;
  
 
 class AdminController extends BackendController
 {
     public function listing(Request $request)
     {
-        $listing = $this->block(\Modules\Admin\View\Components\Admin\Listing::class);
-        $layout = $this->layout();
-        $content = $layout->child('content');
-        $content->child('listing',$listing);
-        return $layout->render();
+        try {
+            $layout  = $this->layout();
+            $layout->title('Manage Admins');
+            $listing = $this->block(Listing::class);
+            $content = $layout->child('content')->child('listing',$listing);
+            return $layout->render();
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error',$th);
+        }
+        
     }
 
     public function add()
     {
-
-        $admin = $this->model(User::class);
-        $edit =  $this->block(Edit::class);
-        $edit->row($admin);
-        $layout  = $this->layout();
-        $content = $layout->child('content');
-        $content->child('edit', $edit);
-        return $layout->render();
-    }
-
-     public function save(Request $request){
-        try{
-            $params = $request->post('admin');
-            if(isset($params['password'])){
-                $params['password'] = Hash::make($params['password']);
-            }
-
-            if($id = $request->get('id')){
-                $admin = User::find($id);
-                if(!$admin->id){
-                    throw new Exception("Invalid Request ID");
-                }
-                $admin->update($params);
-            }
-            else{
-                $admin = User::create($params);
-            }
-            $params = $request->post('role');
-            
-            Role::where('user_id', $admin->id)->delete();
-            
-            if (!is_null($params) && isset($params['role_id'])) {
-                $resourceIds = array_unique($params['role_id']);
-                foreach ($resourceIds as $value) {
-                    Role::create([
-                        'user_id' => $admin->id,
-                        'role_id' => $value,
-                    ]);
-                }
-            }
-            if($admin->id){
-                return redirect()->route('admin.admin.listing')->with('success','Record saved');
-            }
-            else{
-                throw new Exception('Something went wrong');
-            }
+        try {
+            $layout = $this->layout();
+            $layout->title('Add/Edit Admins');
+            $admin  = $this->model(User::class);
+            $row    =  $this->block(Edit::class)->row($admin);
+            $content = $layout->child('content')->child('edit', $row);
+            return $layout->render();
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error',$th);
         }
-        catch(Exception $e){
-            return redirect()->back()->with('error',$e);
-        }
-
     }
 
     public function edit($id)
     {
         try{
-            $admin = User::find($id);
-            if(!$admin->id){
+            $layout  = $this->layout();
+            $layout->title('Add/Edit Admins');
+            if(!$id){
                 throw new Exception("Invalid Request");
             }
-            $edit = $this->model(Edit::class);
-            $edit->row($admin);
-            $layout  = $this->layout();
-            $content = $layout->child('content');
-            $content->Child('edit', $edit);
+            $row = User::find($id);
+            if(!$row){
+                throw new Exception("Invalid Request");
+            }
+            $edit = $this->model(Edit::class)->row($row);
+            $content = $layout->child('content')->Child('edit', $edit);
             return $layout->render();
         }
-        catch (Exception $e){
-            return redirect()->back()->with('error',$e);
+        catch (\Throwable $th) {
+            return redirect()->back()->with('error',$th);
+        }
+    }
+
+    public function save(Request $request)
+    {
+        try {
+            $params = $request->post('admin');
+    
+            if (!empty($params['password'])) {
+                $params['password'] = Hash::make($params['password']);
+            }
+    
+            $row = !empty($params['id'])
+            ? User::findOrFail($params['id'])
+            : new User();
+            
+            $row->fill($params);
+            $row->save();
+    
+            Role::where('user_id', $row->getKey())->delete();
+    
+            $roles = $request->post('role');
+            if (!empty($roles['role_id'])) {
+                $resourceIds = array_unique($roles['role_id']);
+                foreach ($resourceIds as $roleId) {
+                    Role::create([
+                        'user_id' => $row->getKey(),
+                        'role_id' => $roleId,
+                    ]);
+                }
+            }
+            if($request->get('continue')){
+                return redirect()->route('admin.admin.edit', ['id' => $row->getKey()])->with('success', 'Record saved');
+            }
+            return redirect()->route('admin.admin.listing')->with('success', 'Record saved');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error',$th);
         }
     }
 
     public function delete(Request $request){
         try{
-
-            $admin = User::find($request->id);
-            if(!$admin->id){
+            if(!$request->id){
                 throw new Exception("Invalid Request");
             }
-            $admin->delete();
+
+            $row = User::find($request->id);
+            if(!$row){
+                throw new Exception("Invalid Request");
+            }
+            $row->delete();
             return redirect()->route('admin.admin.listing')->with('success','Record deleted');
         }
-        catch (Exception $e){
-            return redirect()->back()->with('error',$e);
+        catch (\Throwable $th) {
+            return redirect()->back()->with('error',$th);
         }
-
     }
 
     public function massDelete(Request $request){
@@ -121,9 +127,8 @@ class AdminController extends BackendController
             User::destroy($ids);
             return redirect()->route('admin.admin.listing')->with('success','Records deleted');
         }
-        catch (Exception $e){
-            return redirect()->back()->with('error',$e);
+        catch (\Throwable $th) {
+            return redirect()->back()->with('error',$th);
         }
-
     }
 }

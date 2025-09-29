@@ -9,10 +9,12 @@ class Block extends Component
 {
     protected $template = 'core::components.template';
     protected $children = [];
+    protected $parent;
     protected $row;
-
+    protected $layout;
 
     public function __construct(){
+        $this->prepareChildern();
     }
 
     public function template($template = null){
@@ -71,7 +73,9 @@ class Block extends Component
     }
 
     public function block($class) {
-        return app()->make($class);
+        $block = app()->make($class);
+        $block->parent($this)->layout($this->layout());
+        return $block;
     }
 
     public function model($class) {
@@ -88,5 +92,25 @@ class Block extends Component
             return $this;
         }
         return $this->row;
+    }
+
+    public function parent($parent = null){
+        if($parent){
+            $this->parent = $parent;
+            return $this;
+        }
+        return $this->parent;
+    }
+
+    public function layout($layout = null){
+        if($layout){
+            $this->layout = $layout;
+            return $this;
+        }
+        return $this->layout;
+    }
+
+    public function prepareChildern()  {
+        return $this;
     }
 }

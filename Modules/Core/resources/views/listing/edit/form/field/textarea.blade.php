@@ -2,8 +2,7 @@
     $value = $field['id'] ?? '';
     $value = $row->$value ?? null;
 @endphp
-
-<div class="form-group">
+<div class="form-group {{ $field['class'] }}" id="options-wrapper">
     <label for="{{ $field['id'] }}" class="form-label">
         {{ $field['label'] ?? ucfirst($field['name']) }}
     </label>
@@ -11,31 +10,15 @@
     <textarea 
         id="{{ $field['id'] }}" 
         name="{{ $field['name'] }}" 
-        class="form-control summernote {{ $field['class'] ?? '' }} @error($field['name']) is-invalid @enderror"
-        rows="{{ $field['rows'] ?? 6 }}"
+        class="form-control @error($field['name']) is-invalid @enderror"
+        rows="{{ $field['rows'] ?? 4 }}"
         placeholder="{{ $field['placeholder'] ?? '' }}"
-        {{ !empty($field['required']) ? 'required' : '' }}
-    >{{ old($field['name'], $value ?? ($field['value'] ?? '')) }}</textarea>
-
+    >{{ old($field['name'], $value ?? '') }}
+    </textarea>
+    @if (!empty($field['note']))
+        <small class="form-text text-muted">{{ $field['note'] }}</small>
+    @endif
     @error($field['name'])
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 </div>
-@push('scripts')
-    <script>
-    $(function () {
-        $('.summernote').summernote({
-            height: 200,
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['strikethrough', 'superscript', 'subscript']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['fullscreen', 'codeview', 'help']]
-            ]
-        });
-    });
-    </script>
-@endpush
