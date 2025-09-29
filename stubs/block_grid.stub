@@ -1,0 +1,97 @@
+<?php
+
+namespace {{BlockNamespace}}\Listing;
+
+use {{ModelNamespace}};
+use Modules\Core\View\Components\Listing\Grid as CoreGrid;
+
+class Grid extends CoreGrid
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->title('Manage {{Plural}}');
+    }
+
+    public function prepareColumns()
+    {
+        // Hardcoded mass_ids column
+        if(canAccess('admin.{{class_lower}}.massDelete')){
+            $this->column('mass_ids', [
+                'name' => '{{PrimaryKey}}',
+                'label' => '',
+                'columnClassName' => '\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
+            ]);
+        }
+
+        {{Columns}}
+
+        return $this;
+    }
+
+    public function prepareActions()
+    {
+        if(canAccess('admin.{{class_lower}}.edit')){
+            $this->action('edit', [
+                'id' => 'editBtn',
+                'title' => 'Edit',
+                'url' => 'admin.{{class_lower}}.edit'
+            ]);
+        }
+
+        if(canAccess('admin.{{class_lower}}.delete')){
+            $this->action('delete', [
+                'id' => 'deleteBtn',
+                'title' => 'Delete',
+                'url' => 'admin.{{class_lower}}.delete'
+            ]);
+        }
+
+        return $this;
+    }
+
+    public function prepareFilters()
+    {
+        {{Filters}}
+
+        return $this;
+    }
+
+    public function prepareMassActions()
+    {
+        if (canAccess('admin.{{class_lower}}.massDelete')) {
+            parent::prepareMassActions();
+            $this->massAction('delete', [
+                'value' => 'mass_delete',
+                'label' => 'Delete Selected',
+                'url'   => 'admin.{{class_lower}}.massDelete',
+            ]);
+        }
+    }
+    
+    public function prepareCollection() 
+    {
+        $model = $this->model({{Model}}::class);
+        $query = $model->query();
+
+        if ($this->sortColumn() && $this->sortDir()) {
+            $query->orderBy($this->sortColumn(), $this->sortDir());
+        }
+
+        $this->applyFilters($query);
+        $this->pager($query);
+
+        return $this;
+    }
+
+    public function prepareButtons()
+    {
+        if (canAccess('admin.{{class_lower}}.add')) {
+            $this->button('add', [
+                'route' => urlx('admin.{{class_lower}}.add', [], true),
+                'label' => 'Add {{Model}}',
+            ]);
+        }
+        return $this;
+    }
+}

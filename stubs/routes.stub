@@ -1,0 +1,10 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Modules\Admin\Http\Middleware\AdminAuthenticate;
+use Modules\Admin\Http\Middleware\AdminPermission;
+{{ControllerUses}}
+
+Route::prefix('admin')->middleware([AdminAuthenticate::class, AdminPermission::class])->group(function () {
+{{Routes}}
+});

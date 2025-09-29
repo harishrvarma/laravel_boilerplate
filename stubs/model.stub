@@ -1,0 +1,12 @@
+<?php
+
+namespace {{ModelNamespaceOnly}};
+
+use Illuminate\Database\Eloquent\Model;
+
+class {{Class}} extends Model
+{
+    protected $table = '{{Table}}';
+    protected $primaryKey = '{{PrimaryKey}}';
+    protected $fillable = [{{FieldNames}}];
+}

@@ -1,0 +1,13 @@
+<?php
+
+namespace Modules\{{Module}}\Database\Seeders;
+use Modules\{{Module}}\Database\Seeders\AdminResourceSeeder;
+use Illuminate\Database\Seeder;
+
+class {{Module}}DatabaseSeeder extends Seeder
+{
+    public function run()
+    {
+        $this->call(AdminResourceSeeder::class);
+    }
+}
