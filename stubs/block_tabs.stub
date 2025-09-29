@@ -1,0 +1,24 @@
+<?php
+
+namespace {{BlockNamespace}}\Listing\Edit;
+
+use Modules\Core\View\Components\Listing\Edit\Tabs as CoreTabs;
+
+class Tabs extends CoreTabs
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function prepareTabs()
+    {
+        $this->tab('{{table}}', [
+            'key'   => '{{table}}',
+            'title' => '{{Singular}}',
+            'tabClassName' => '\Modules\{{Module}}\View\Components\{{FullClassPath}}\Listing\Edit\Tabs\General',
+        ]);
+
+        return $this;
+    }
+}

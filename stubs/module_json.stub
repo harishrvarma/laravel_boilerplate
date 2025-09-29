@@ -1,0 +1,12 @@
+{
+  "name": "{{Module}}",
+  "alias": "{{module_lower}}",
+  "description": "",
+  "keywords": [],
+  "priority": 0,
+  "active": true,
+  "providers": [
+    "Modules\\{{Module}}\\Providers\\{{Module}}ServiceProvider"
+  ],
+  "files": []
+}

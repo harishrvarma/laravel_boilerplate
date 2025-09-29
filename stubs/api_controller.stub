@@ -1,0 +1,55 @@
+<?php
+
+namespace {{Namespace}};
+
+use Exception;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use {{ModelNamespace}};
+
+class {{Class}}Controller extends Controller
+{
+    public function listing()
+    {
+        $items = {{Model}}::all();
+        return response()->json($items);
+    }
+
+    public function save(Request $request)
+    {
+        try {
+            $params = $request->post('{{class_lower}}');
+            if ($id = $request->get({{PrimaryKey}})) {
+                $item = {{Model}}::find($id);
+                if (!$item || !$item->id) {
+                    throw new Exception("Invalid Request ID");
+                }
+                $item->update($params);
+            } else {
+                $item = {{Model}}::create($params);
+            }
+
+            if ($item->id) {
+                return response()->json($item);
+            } else {
+                throw new Exception('Something went wrong');
+            }
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function delete(Request $request)
+    {
+        try {
+            $item = {{Model}}::find($request->id);
+            if (!$item || !$item->id) {
+                throw new Exception("Invalid Request");
+            }
+            $item->delete();
+            return response()->json(['success' => 'Record deleted']);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+}
