@@ -1,12 +1,3 @@
-{{-- Loop Fields --}}
-@if($fields = $me->fields())
-    @foreach($fields as $key => $field)
-        @php
-            echo $me->getFieldBlock($field)->render();
-        @endphp
-    @endforeach
-@endif
-
 @if($buttons = $me->buttons())
     <div class="card-footer d-flex justify-content-end gap-2">
         @foreach($buttons as $button)
@@ -21,4 +12,12 @@
             @endif
         @endforeach
     </div>
+@endif
+{{-- Loop Fields --}}
+@if($fields = $me->fields())
+    @foreach($fields as $key => $field)
+        @php
+            echo $me->getFieldBlock($field)->render();
+        @endphp
+    @endforeach
 @endif

@@ -12,6 +12,7 @@ class BackendController extends Controller
     protected function layout(){
         if(is_null($this->layout)){
             $this->layout = app()->make(Layout::class);
+            $this->layout->layout($this->layout)->init();
         }
         return $this->layout;
     }

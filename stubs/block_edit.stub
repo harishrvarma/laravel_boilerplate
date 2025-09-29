@@ -45,8 +45,8 @@ class Edit extends CoreEdit
 
     public function saveUrl()
     {
-        if ($this->row()->{{PrimaryKey}}) {
-            return urlx('admin.{{class_lower}}.save', ['id' => $row->getKey()]);
+        if ($this->row()->getKey()) {
+            return urlx('admin.{{class_lower}}.save', ['id' => $this->row()->getKey()]);
         }
         return urlx('admin.{{class_lower}}.save');
     }

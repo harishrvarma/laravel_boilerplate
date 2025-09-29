@@ -4,13 +4,6 @@
     </div>
 <div class="card shadow-sm">
     <form action="{{ $me->saveUrl() }}" method="post">
-        @csrf
-        @if($tabs = $me->getTabsBlock())
-            <div class="card-body">
-                {{ $tabs->render() }}
-            </div>
-        @endif
-
         <!-- Buttons in footer -->
         @if($buttons = $me->buttons())
             <div class="card-footer d-flex justify-content-end gap-2">
@@ -27,5 +20,14 @@
                 @endforeach
             </div>
         @endif
+
+        @csrf
+        @if($tabs = $me->getTabsBlock())
+            <div class="card-body">
+                {{ $tabs->render() }}
+            </div>
+        @endif
+
+
     </form>
 </div>

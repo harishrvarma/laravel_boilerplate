@@ -22,6 +22,15 @@ class Edit extends CoreEdit
             ]);
         }
 
+        if(canAccess('admin.admin.save')){
+            $this->button('saveandcontinue',[
+                'id' => 'saveandcontinueBtn',
+                'name'=>'Save & Continue',
+                'class'=>'btn btn-primary',
+                'method' => "this.form.action = '" . urlx('admin.admin.save',['continue' => 1]) . "'; this.form.submit();",
+            ]);
+        }
+
          $this->button('back',[
             'id' => 'backBtn',
             'name'=>'Back',

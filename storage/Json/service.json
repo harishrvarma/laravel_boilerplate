@@ -1,0 +1,32 @@
+{
+    "base_path": "__DIR__/",
+    "module": "Service",
+    "tables": [
+      {
+        "name": "service",
+        "primary_key": "service_id",
+        "fields": [
+          { "name": "service_id", "type": "int", "primary": true },
+          { "name": "title", "type": "string" },
+          { "name": "description", "type": "text", "nullable": true },
+          { "name": "price", "type": "decimal", "nullable": true },
+          { "name": "duration", "type": "int", "nullable": true },
+          { "name": "status", "type": "tinyint", "nullable": true },
+          { "name": "created_at", "type": "datetime", "nullable": true },
+          { "name": "updated_at", "type": "datetime", "nullable": true }
+        ],
+        "path_mode": "nested",
+        "ignore_module_prefix": true
+      }
+    ],
+    "generate": {
+      "controller": true,
+      "model": true,
+      "blocks": true,
+      "routes": true,
+      "migration": true,
+      "config": true,
+      "seeder": true
+    }
+  }
+  

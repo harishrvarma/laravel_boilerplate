@@ -389,7 +389,7 @@ class Grid extends Block
         $icon = $action['icon'] ?? '';
         $title = $action['title'];
         $class = $action['class'] ?? 'btn btn-sm btn-secondary';
-        return "<a href=\"" . $this->urlx($url, ['id' => $row->id]) . "\" class=\"$class\">$icon $title</a>";
+        return "<a href=\"" . $this->urlx($url, ['id' => $row->getKey()]) . "\" class=\"$class\">$icon $title</a>";
     }
 
 

@@ -4,44 +4,29 @@ use Modules\Core\View\Components\Block;
 use Modules\Core\View\Components\Html\Content;
 use Modules\Core\View\Components\Html\Header;
 use Modules\Core\View\Components\Html\Footer;
+use Modules\Core\View\Components\Html\Head;
 
 class Layout extends Block
 {
     protected $template = 'core::components.layout.layout';
 
-    protected $styles = [];
-
-    protected $scripts = [];
-
-    protected $title = null;
-
     public function __construct(){
+        parent::__construct();
+    }
+
+    public function init()  {
         $this->child('header',$this->block(Header::class));
         $this->child('content',$this->block(Content::class));
         $this->child('footer',$this->block(Footer::class));
+        $this->child('head',$this->block(Head::class));
+        return $this;
     }
 
-    public function styles($styles = null){
-         if(is_array($styles)){
-             $this->styles = $styles;
-             return $this;
+    public function title(string $title = null) {
+        if(!empty($title)){
+            $this->child('head')->title($title);
+            return $this;
         }
-        return $this->styles;
-    }
-
-    public function scripts($scripts = null){
-         if(is_array($scripts)){
-             $this->scripts = $scripts;
-             return $this;
-        }
-        return $this->scripts;
-    }
-
-    public function title($title = null){
-        if(!is_null($title)){
-             $this->title = $title;
-             return $this;
-        }
-        return $this->title;
+        return $this->child('head')->title();
     }
 }

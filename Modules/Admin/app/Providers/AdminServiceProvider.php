@@ -209,6 +209,10 @@ class AdminServiceProvider extends ServiceProvider
         foreach ($parts as $level => $part) {
             $code = $code ? $code . '.' . $part : $part;
             $isLast = $level + 1 === count($parts);
+
+            if ($level === 0 && $part === 'admin') {
+                continue;
+            }
     
             // 👉 Name: only for last part
             $name = $isLast ? ucfirst(str_replace('_', ' ', $part)) : null;
