@@ -109,6 +109,8 @@ class Menu extends Model
             $menu->path_ids = $path;
             $menu->level = substr_count($path, '/');
             $menu->saveQuietly();
+
+            app('menu.cache')->clearAll();
         });
 
         static::updating(function (Menu $menu) {
@@ -133,22 +135,11 @@ class Menu extends Model
                     $d->saveQuietly();
                 }
             }
-        });
 
-        static::saved(function (Menu $menu) {
-            $admins = \Modules\Admin\Models\User::all();
-            foreach ($admins as $user) {
-                Cache::forget('admin_menu_' . $user->id);
-            }
+            app('menu.cache')->clearAll();
         });
     
         static::deleted(function (Menu $menu) {
-            // clear cache
-            $admins = \Modules\Admin\Models\User::all();
-            foreach ($admins as $user) {
-                Cache::forget('admin_menu_' . $user->id);
-            }
-        
             // check if parent has no more children -> delete parent too
             if ($menu->parent_id) {
                 $parent = self::find($menu->parent_id);
@@ -156,6 +147,7 @@ class Menu extends Model
                     $parent->delete();
                 }
             }
+            app('menu.cache')->clearAll();
         });
         
     }
@@ -193,24 +185,28 @@ class Menu extends Model
     /**
      * Build menu tree from resources the user has access to
      */
-    public static function buildMenuFromResources($user)
+    public static function buildMenuFromResources($user = null)
     {
-        if (!$user) return collect();
-
-        // All resources the user can access
-        $resources = $user->allResources(); // returns Collection
-        $resourceIds = $resources->pluck('id')->toArray();
-
-        // Menus linked to accessible resources
-        $menus = self::with('resource')
-            ->whereIn('resource_id', $resourceIds)
-            ->where('is_active', 1)
-            ->get();
-
+        if ($user) {
+            // User-specific menus
+            $resources = $user->allResources(); // returns Collection
+            $resourceIds = $resources->pluck('id')->toArray();
+    
+            $menus = self::with('resource')
+                ->whereIn('resource_id', $resourceIds)
+                ->where('is_active', 1)
+                ->get();
+        } else {
+            // Global menus (all active menus)
+            $menus = self::with('resource')
+                ->where('is_active', 1)
+                ->get();
+        }
+    
         // Include all parent menus recursively
         $allMenuIds = $menus->pluck('id')->toArray();
         $parents = collect();
-
+    
         foreach ($menus as $menu) {
             $parent = $menu->parent;
             while ($parent) {
@@ -221,11 +217,12 @@ class Menu extends Model
                 $parent = $parent->parent;
             }
         }
-
+    
         $menus = $menus->merge($parents);
-
+    
         return self::buildTree($menus);
     }
+    
 
     /*
     |--------------------------------------------------------------------------

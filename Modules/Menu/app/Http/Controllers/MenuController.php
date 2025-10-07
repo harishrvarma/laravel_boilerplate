@@ -54,9 +54,29 @@ class MenuController extends BackendController
     {
         try {
             $params = $request->post('menu');
-            $area = $params['area'] ?? 'admin';
-            $resourceIds = $params['resource_ids'] ?? [];
+            $area   = $params['area'] ?? 'admin';
     
+            // Detect if edit mode (menu_id is passed)
+            $menuId = $request->get('id') ?? null;
+    
+            if ($menuId && $request->get('tab') != 'resource') {
+                $menu = Menu::findOrFail($menuId);
+    
+                $menu->title     = $params['title'] ?? $menu->title;
+                $menu->icon      = $params['icon'] ?? $menu->icon;
+                $menu->order_no  = $params['order_no'] ?? $menu->order_no;
+                $menu->is_active = $params['is_active'] ?? $menu->is_active;
+                $menu->item_type = $params['item_type'] ?? $menu->item_type;
+    
+                $menu->save();
+    
+                return redirect()
+                    ->route('admin.menu.listing')
+                    ->with('success', 'Menu updated successfully.');
+            }
+    
+            // ADD MODE
+            $resourceIds = $params['resource_ids'] ?? [];
             if (empty($resourceIds)) {
                 return redirect()->back()->withInput()->with('error', 'Please select at least one menu item.');
             }
@@ -67,12 +87,10 @@ class MenuController extends BackendController
     
                 $title = $resource->label ?? ucfirst(str_replace('.', ' ', $resource->code));
     
-                // Determine if it's a folder or file
-                $isFolder = str_ends_with($resource->code, '.*'); // adjust based on your resource code logic
+                $isFolder = str_ends_with($resource->code, '.*');
                 $itemType = $isFolder ? 'folder' : 'file';
-                $icon = $isFolder ? 'fas fa-folder' : 'fas fa-file';
+                $icon     = $isFolder ? 'fas fa-folder' : 'fas fa-file';
     
-                // Check if menu already exists for this resource in the area
                 $menu = Menu::firstOrCreate(
                     ['resource_id' => $resourceId, 'area' => $area],
                     [
@@ -84,7 +102,7 @@ class MenuController extends BackendController
                     ]
                 );
     
-                // Automatically create parent menus if needed
+                // auto-parent handling...
                 $parts = explode('.', $resource->code);
                 if (count($parts) > 1) {
                     $parentCode = implode('.', array_slice($parts, 0, -1));
@@ -102,7 +120,6 @@ class MenuController extends BackendController
                             ]
                         );
     
-                        // Attach parent to current menu if not already set
                         if (!$menu->parent_id) {
                             $menu->parent_id = $parentMenu->id;
                             $menu->saveQuietly();
@@ -122,6 +139,7 @@ class MenuController extends BackendController
                 ->with('error', $e->getMessage());
         }
     }
+    
     
     public function saveTree(Request $request)
     {

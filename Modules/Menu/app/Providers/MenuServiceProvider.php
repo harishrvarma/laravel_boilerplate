@@ -36,6 +36,9 @@ class MenuServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton('menu.cache', function () {
+            return new \Modules\Menu\Services\MenuCache();
+        });
     }
 
     /**
