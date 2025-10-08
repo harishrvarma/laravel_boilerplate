@@ -32,8 +32,8 @@ class Edit extends CoreEdit
     }
 
     public function saveUrl(){
-        if($this->row()->id){
-            return  urlx('admin.cron.save',['id'=>$this->row()->id]);
+        if($this->row()->getKey()){
+            return  urlx('admin.cron.save',['id'=>$this->row()->getKey()]);
         }
         return  urlx('admin.cron.save');
     }

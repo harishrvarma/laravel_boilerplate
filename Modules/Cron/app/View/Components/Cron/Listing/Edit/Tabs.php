@@ -20,7 +20,7 @@ class Tabs extends CoreTabs
         $this->tab('logs', [
             'key' => 'logs',
             'title' => 'Logs',
-            'tabClassName'=>'\Modules\Cron\View\Components\Cron\Listing\Edit\Tabs\CronLogsGrid',
+            'tabClassName'=>'\Modules\Cron\View\Components\Cron\Listing\Edit\Tabs\ScheduleGrid',
         ]);
         return $this;
     }
