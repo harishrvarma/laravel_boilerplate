@@ -15,7 +15,7 @@ class GenerateSchedules extends Command
 
     public function handle()
     {
-        $now = Carbon::now('UTC');
+        $now = Carbon::now('UTC')->seconds(0); // round seconds to avoid duplicates
 
         $intervalMinutes = 60; // base interval (minutes)
         $intervalFactor  = 2;  // horizon factor multiplier
@@ -44,7 +44,7 @@ class GenerateSchedules extends Command
             return;
         }
 
-        // Get frequency of cron expression
+        // Get frequency of cron expression in minutes
         $cronInterval = $this->getCronIntervalMinutes($cron->expression);
 
         // Get latest scheduled entry
@@ -52,21 +52,19 @@ class GenerateSchedules extends Command
             ->orderByDesc('scheduled_for')
             ->first();
 
-            if ($lastSchedule) {
-                $lastScheduleTime = Carbon::parse($lastSchedule->scheduled_for);
-                $totalGapMinutes = $now->diffInMinutes($lastScheduleTime, false);
-            } else {
-                $lastScheduleTime = $now->copy();
-                $totalGapMinutes = 0;
-            }
-            
+        if ($lastSchedule) {
+            $lastScheduleTime = Carbon::parse($lastSchedule->scheduled_for)->seconds(0);
+            $totalGapMinutes = $lastScheduleTime->diffInMinutes($now);
+        } else {
+            $lastScheduleTime = $now->copy();
+            $totalGapMinutes = 0;
+        }
 
         // Remaining time before we reach horizon
-        $remainingTime = $frameTime - $totalGapMinutes;
+        $remainingTime = max(0, $frameTime - $totalGapMinutes);
 
         $this->line("🕒 {$cron->name}: last={$lastScheduleTime->format('H:i')} | frame={$frameTime}m | gap={$totalGapMinutes}m | remaining={$remainingTime}m");
 
-        // Skip if remaining is negative (we're already beyond the frame)
         if ($remainingTime <= 0) {
             $this->line("⏭ {$cron->name}: already beyond horizon, skipping.");
             return;
@@ -82,12 +80,11 @@ class GenerateSchedules extends Command
 
         $this->line("📅 {$cron->name}: will generate {$scheduleCount} new schedules (every {$cronInterval}m)");
 
-        $created = 0;
         $nextRun = $cronExpr->getNextRunDate($lastScheduleTime, 0, true);
-
+        $created = 0;
 
         for ($i = 0; $i < $scheduleCount; $i++) {
-            $nextRunTime = Carbon::parse($nextRun);
+            $nextRunTime = Carbon::parse($nextRun)->seconds(0);
 
             $exists = Schedule::where('cron_id', $cron->cron_id)
                 ->where('scheduled_for', $nextRunTime->format('Y-m-d H:i:s'))
@@ -105,17 +102,21 @@ class GenerateSchedules extends Command
                 $this->line("⚪ Exists {$nextRunTime->format('Y-m-d H:i')}");
             }
 
-            $nextRun = $cronExpr->getNextRunDate($nextRun, 0, false);
+            // get next run from the current nextRunTime
+            $nextRun = $cronExpr->getNextRunDate($nextRunTime, 0, false);
         }
 
         $this->info("🟢 {$cron->name}: {$created} new schedules created.");
     }
 
+    /**
+     * Get the interval in minutes for a cron expression.
+     */
     protected function getCronIntervalMinutes(string $expression): int
     {
         $cron = CronExpression::factory($expression);
-        $now = Carbon::now('UTC');
+        $now = Carbon::now('UTC')->seconds(0);
         $next = $cron->getNextRunDate($now);
-        return $now->diffInMinutes($next);
+        return $now->diffInMinutes(Carbon::parse($next));
     }
 }
