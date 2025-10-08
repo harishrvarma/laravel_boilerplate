@@ -9,10 +9,11 @@
 </nav>
 
 @php
-use Modules\Menu\Models\Menu;
+use Illuminate\Support\Facades\App;
 
 $user = auth('admin')->user();
-$menuTree = $user ? Menu::buildMenuFromResources($user) : [];
+
+$menuTree = App::make('menu.cache')->getGlobal();
 
 // Recursive renderer
 function renderMenuTree($items) {

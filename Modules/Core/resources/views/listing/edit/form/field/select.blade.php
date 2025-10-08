@@ -11,7 +11,6 @@
     }
 @endphp
 
-
 <div class="mb-3">
     <label for="{{ $field['id'] }}" class="form-label">
         {{ $field['label'] ?? ucfirst($field['name']) }}
@@ -24,13 +23,12 @@
         @if(!empty($field['multiselect'])) multiple @endif
         data-placeholder="{{ $field['placeholder'] ?? 'Select option(s)' }}"
     >
-    @foreach(($field['options'] ?? []) as $key => $option)
-    <option value="{{ $key }}"
-        {{ in_array($key, $selectedValues) ? 'selected' : '' }}>
-        {{ $option }}
-    </option>
-@endforeach
-
+        @foreach(($field['options'] ?? []) as $key => $option)
+            <option value="{{ $key }}"
+                {{ in_array($key, $selectedValues) ? 'selected' : '' }}>
+                {{ $option }}
+            </option>
+        @endforeach
     </select>
 
     @error($field['name'])
@@ -38,9 +36,23 @@
     @enderror
 </div>
 
+{{-- Options builder section (hidden by default) --}}
+<div class="mb-3 settings-options d-none">
+    <label class="form-label">Options</label>
+    <div id="options-wrapper">
+        <div class="option-row d-flex gap-2 mb-2">
+            <input type="text" name="options[0][key]" class="form-control w-25" placeholder="Key">
+            <input type="text" name="options[0][value]" class="form-control w-50" placeholder="Value">
+            <button type="button" class="btn btn-danger btn-remove-option">Remove</button>
+        </div>
+    </div>
+    <button type="button" id="add-option" class="btn btn-primary mt-2">Add More</button>
+</div>
+
 @push('scripts')
 <script>
 $(function () {
+    // Initialize Select2
     $('#{{ $field['id'] }}').select2({
         theme: 'bootstrap4',
         width: '100%',
@@ -72,7 +84,26 @@ $(function () {
 
     toggleOptions();
     $inputType.on("change", toggleOptions);
-});
 
+    // Dynamic option fields
+    let optionIndex = 1;
+
+    $('#add-option').on('click', function () {
+        let newRow = `
+            <div class="option-row d-flex gap-2 mb-2">
+                <input type="text" name="options[${optionIndex}][key]" class="form-control w-25" placeholder="Key">
+                <input type="text" name="options[${optionIndex}][value]" class="form-control w-50" placeholder="Value">
+                <button type="button" class="btn btn-danger btn-remove-option">Remove</button>
+            </div>
+        `;
+        $('#options-wrapper').append(newRow);
+        optionIndex++;
+    });
+
+    // Remove option row
+    $(document).on('click', '.btn-remove-option', function () {
+        $(this).closest('.option-row').remove();
+    });
+});
 </script>
 @endpush
