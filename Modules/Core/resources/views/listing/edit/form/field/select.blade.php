@@ -39,6 +39,8 @@
 {{-- Options builder section (hidden by default) --}}
 <div class="mb-3 settings-options d-none">
     <label class="form-label">Options</label>
+
+    {{-- Option rows --}}
     <div id="options-wrapper">
         <div class="option-row d-flex gap-2 mb-2">
             <input type="text" name="options[0][key]" class="form-control w-25" placeholder="Key">
@@ -47,7 +49,16 @@
         </div>
     </div>
     <button type="button" id="add-option" class="btn btn-primary mt-2">Add More</button>
+
+    {{-- Textarea for function-based options --}}
+    <div class="mt-3">
+        <label class="form-label">Dynamic Options Source (optional)</label>
+        <textarea name="options_source" id="options_source" class="form-control" rows="2"
+                  placeholder="Enter function path e.g. Modules\Settings\Models\ConfigOption::options"></textarea>
+        <small class="text-muted">If this field is filled, manual options above will be ignored.</small>
+    </div>
 </div>
+
 
 @push('scripts')
 <script>
@@ -81,6 +92,7 @@ $(function () {
             $optionsField.addClass("d-none");
         }
     }
+
 
     toggleOptions();
     $inputType.on("change", toggleOptions);

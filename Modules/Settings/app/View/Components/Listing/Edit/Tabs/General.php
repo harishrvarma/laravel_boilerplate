@@ -36,9 +36,61 @@ class General extends CoreForm
             ];
     
             if (in_array($key->input_type, ['select', 'radio', 'checkbox'])) {
-                $options = $key->options()->orderBy('position')->get()->mapWithKeys(function ($option) {
-                    return [$option->option_value => $option->option_label];
-                })->toArray();
+    
+                $options = []; // default fallback
+
+                if (!empty($key->options_source)) {
+                    try {
+                        if (str_contains($key->options_source, '::')) {
+                            [$class, $method] = explode('::', $key->options_source, 2);
+
+                            if (class_exists($class)) {
+                                $instance = app($class);
+
+                                if (method_exists($instance, $method)) {
+                                    // Call non-static method
+                                    $options = $instance->{$method}();
+                                } elseif (method_exists($class, $method)) {
+                                    // Fallback: call static method
+                                    $options = $class::$method();
+                                } else {
+                                    // 🚫 Method not found → just leave options blank
+                                    \Log::warning("⚠️ Method {$method} not found in {$class}");
+                                    $options = [];
+                                }
+
+                                // Normalize result
+                                if ($options instanceof \Illuminate\Support\Collection) {
+                                    $options = $options->toArray();
+                                }
+
+                                if (!is_array($options)) {
+                                    \Log::warning("⚠️ Invalid return type from {$key->options_source}");
+                                    $options = [];
+                                }
+
+                            } else {
+                                \Log::warning("⚠️ Class {$class} not found for options source {$key->options_source}");
+                            }
+                        } else {
+                            \Log::warning("⚠️ Invalid format for options source '{$key->options_source}' (expected 'Class::method')");
+                        }
+
+                    } catch (\Throwable $e) {
+                        \Log::error("⚠️ Failed to load dynamic options for {$key->key_name}: {$e->getMessage()}");
+                        $options = [];
+                    }
+                }
+
+                
+    
+                if (empty($options)) {
+                    $options = $key->options()
+                        ->orderBy('position')
+                        ->get()
+                        ->mapWithKeys(fn($option) => [$option->option_value => $option->option_label])
+                        ->toArray();
+                }
     
                 $fieldData['options'] = $options;
     
@@ -49,9 +101,12 @@ class General extends CoreForm
                     $fieldData['selected'] = $selectedValues;
                 }
             }
+    
             $this->field($key->key_name, $fieldData);
         }
+    
         return $this;
     }
+    
 }
 

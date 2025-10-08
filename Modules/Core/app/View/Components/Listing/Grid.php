@@ -113,12 +113,24 @@ class Grid extends Block
 
     public function pager($query = null)
     {
-        if($query){
+        if ($query) {
             $this->totalCount = $query->count();
-
+    
             $this->rows = $query
                 ->forPage($this->page(), $this->perPage())
                 ->get();
+    
+            $selectAll = (int) request()->get('selectAll', 0);
+            
+            if ($selectAll === 1) {
+                foreach ($this->rows as $row) {
+                    $row->selected = true;
+                }
+            } elseif ($selectAll === 0) {
+                foreach ($this->rows as $row) {
+                    $row->selected = false;
+                }
+            }
     
             $this->paginator = new LengthAwarePaginator(
                 $this->rows,
@@ -128,8 +140,10 @@ class Grid extends Block
                 ['path' => request()->url(), 'query' => request()->query()]
             );
         }
-        return new Pagination($this->paginator,[],$this->perPage(),$this);
+    
+        return new Pagination($this->paginator, [], $this->perPage(), $this);
     }
+    
 
     protected function applyFilters($query)
     {

@@ -119,4 +119,64 @@ class {{Class}}Controller extends BackendController
             return redirect()->back()->with('error', $th->getMessage());
         }
     }
+
+    public function massExport(Request $request)
+    {
+        try {
+            $ids = $request->post('mass_ids', []);
+
+            // Get visible columns
+            $columns = $request->post('visible_columns', '');
+            $columns = $columns ? explode(',', $columns) : ['id'];
+
+            // Remove duplicates
+            $columns = array_unique($columns);
+
+            // Get actual table columns from DB
+            $modelInstance = new {{Model}}();
+            $tableColumns = $modelInstance->getConnection()->getSchemaBuilder()->getColumnListing($modelInstance->getTable());
+
+            // Keep only columns that exist in DB
+            $columns = array_intersect($columns, $tableColumns);
+
+            // Build query
+            $query = {{Model}}::query();
+
+            if (!empty($ids)) {
+                $query->whereIn('id', $ids);
+            }
+
+            $records = $query->get($columns);
+
+            $filename = '{{class_lower}}_export_' . date('Y-m-d_H-i-s') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"$filename\"",
+            ];
+
+            $callback = function() use ($records, $columns) {
+                $file = fopen('php://output', 'w');
+
+                // Header row
+                fputcsv($file, $columns);
+
+                // Data rows
+                foreach ($records as $record) {
+                    $row = [];
+                    foreach ($columns as $col) {
+                        $row[] = $record->{$col};
+                    }
+                    fputcsv($file, $row);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
 }

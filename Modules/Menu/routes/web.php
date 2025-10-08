@@ -39,6 +39,10 @@ Route::prefix('admin')->group(function () {
             ->name('admin.menu.massDelete')
             ->defaults('label', 'Mass Delete Menus');
 
+        Route::post('/menu/export', [MenuController::class, 'massExport'])
+            ->name('admin.menu.export')
+            ->defaults('label', 'Mass Export Menus');
+
         // Tree View (Manage Menu Structure)
         Route::get('/menu/tree', [MenuController::class, 'tree'])
             ->name('admin.menu.tree')

@@ -2,13 +2,22 @@
         <h2 class="mb-3">{{ $me->title() }}</h2>
     </div>
 <div class="card shadow-sm">
-    <div class="card-header d-flex align-items-center">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        {{-- Left side: select actions --}}
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ urlx(null,['selectAll' => 1]) }}" class="text-decoration-none">Select All</a>
+            <span>|</span>
+            <a href="{{ urlx(null,['selectAll' => 0]) }}" class="text-decoration-none">Unselect All</a>
+        </div>
+
+
+        {{-- Right side: custom buttons --}}
         @if($me->buttons())
             <div class="ms-auto">
                 @foreach ($me->buttons() as $button)
                     <a href="{{ $button['route'] ?? '#' }}" 
-                    class="btn btn-primary btn-sm">
-                    {{ $button['label'] ?? '' }}
+                       class="btn btn-primary btn-sm">
+                       {{ $button['label'] ?? '' }}
                     </a>
                 @endforeach
             </div>
@@ -72,7 +81,7 @@
                             @if($filter)
                                 <div class="dropdown ms-2">
                                     <button class="btn btn-sm {{ request('filter.' . $column['name']) ? 'btn-warning' : 'btn-secondary' }}"
-                                            type="button" data-bs-toggle="dropdown">
+                                            type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                                         <i class="fas fa-filter"></i>
                                     </button>
                                     <div class="dropdown-menu p-3" style="min-width:250px;">
@@ -158,22 +167,41 @@
         return currentUrl.toString();
 
     }
-function massAction(ele){
-    let actionUrl = jQuery("#"+ele).data('url');
-    if(actionUrl){
+    function massAction(ele){
+        let actionUrl = jQuery("#"+ele).data('url');
         let massIds = jQuery('.mass_ids:checked').map(function() {
             return this.value;
         }).get();
-        if (massIds.length === 0) {
-            alert('Please select at least one ID');
-            jQuery('#mass_action').val('none');
-            return;
+
+        // Get visible columns from hidden input
+        let visibleColumns = jQuery('#visible_columns').val();
+
+        if(ele === 'mass_export'){
+            // Export does not require selection
+            actionUrl = urlx(actionUrl, {
+                mass_ids: massIds.length ? massIds : [], // selected IDs or empty array
+                visible_columns: visibleColumns
+            });
+        } else {
+            // Other actions (like delete) require at least one checkbox
+            if(massIds.length === 0){
+                alert('Please select at least one ID');
+                jQuery('#mass_action').val('none');
+                return;
+            }
+            actionUrl = urlx(actionUrl, {mass_ids: massIds});
         }
-        actionUrl = urlx(actionUrl,{mass_ids:massIds});
-    }else{
-        actionUrl = urlx(null,{mass_ids:null})
+
+        // Only set form action; submission is handled by the existing button
+        jQuery('#main-form').attr('action', actionUrl);
     }
-    jQuery('#main-form').attr('action', actionUrl);
-}
+
+    $(document).on('keydown', '.dropdown-menu input, .dropdown-menu select', function(e){
+        if(e.key === 'Enter'){
+            e.preventDefault();
+            $(this).closest('form').submit();
+        }
+    });
+
 </script>
 @endpush
