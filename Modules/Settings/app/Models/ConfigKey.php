@@ -17,6 +17,7 @@ class ConfigKey extends Model
         'input_type',
         'is_required',
         'default_value',
+        'options_source',
         'validation_rule',
         'is_user_config',
         'position',

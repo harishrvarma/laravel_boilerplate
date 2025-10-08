@@ -87,9 +87,10 @@ class ConfigController extends BackendController
     public function saveFields(Request $request)
     {
         try {
-            $params  = $request->post('config');
-            $options = $request->post('options', []);
-            $tab     = $request->get('activeTab');
+            $params         = $request->post('config');
+            $options        = $request->post('options', []);
+            $optionsSource  = trim($request->post('options_source', ''));
+            $tab            = $request->get('activeTab');
     
             if (!$tab) {
                 throw new \Exception('Invalid Config Group');
@@ -108,27 +109,29 @@ class ConfigController extends BackendController
                 }
     
                 $configKey->update([
-                    'key_name'      => $params['key_name'] ?? $configKey->key_name,
-                    'label'         => $params['label'] ?? $configKey->label,
-                    'input_type'    => $params['input_type'] ?? $configKey->input_type,
-                    'is_required'   => isset($params['is_required']) ? 1 : 0,
-                    'default_value' => $params['default_value'] ?? $configKey->default_value,
+                    'key_name'        => $params['key_name'] ?? $configKey->key_name,
+                    'label'           => $params['label'] ?? $configKey->label,
+                    'input_type'      => $params['input_type'] ?? $configKey->input_type,
+                    'is_required'     => isset($params['is_required']) ? 1 : 0,
+                    'default_value'   => $params['default_value'] ?? $configKey->default_value,
+                    'options_source'  => $optionsSource ?: null, // ✅ new field
                 ]);
             } else {
                 $configKey = ConfigKey::create([
-                    'key_name'      => $params['key_name'] ?? null,
-                    'label'         => $params['label'] ?? null,
-                    'input_type'    => $params['input_type'] ?? 'text',
-                    'is_required'   => isset($params['is_required']) ? 1 : 0,
-                    'default_value' => $params['default_value'] ?? null,
+                    'key_name'        => $params['key_name'] ?? null,
+                    'label'           => $params['label'] ?? null,
+                    'input_type'      => $params['input_type'] ?? 'text',
+                    'is_required'     => isset($params['is_required']) ? 1 : 0,
+                    'default_value'   => $params['default_value'] ?? null,
+                    'options_source'  => $optionsSource ?: null, // ✅ new field
                 ]);
             }
     
             if ($configKey && $configKey->id) {
                 $configKey->groups()->syncWithoutDetaching([$group->id]);
     
-                // Handle options for select/radio/checkbox
-                if (!empty($options) && in_array($params['input_type'], ['select','radio','checkbox'])) {
+                // ✅ Handle options only if no dynamic source provided
+                if (empty($optionsSource) && !empty($options) && in_array($params['input_type'], ['select','radio','checkbox'])) {
                     $position = 1;
                     $currentOptionValues = [];
     
@@ -161,6 +164,9 @@ class ConfigController extends BackendController
     
                     // Remove options that are no longer present
                     $configKey->options()->whereNotIn('option_value', $currentOptionValues)->delete();
+                } else {
+                    // ✅ If dynamic source is set, remove all old manual options
+                    $configKey->options()->delete();
                 }
             }
     
@@ -173,7 +179,6 @@ class ConfigController extends BackendController
                 ->with('error', $e->getMessage());
         }
     }
-    
 
     public function saveConfig(Request $request)
     {

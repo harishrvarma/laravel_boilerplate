@@ -300,6 +300,8 @@ class ModuleScaffolder
                         ->name('{$routeName}.delete')->defaults('label', 'Delete {$className}');
                     Route::post('/$routePath/massDelete', [{$className}Controller::class, 'massDelete'])
                         ->name('{$routeName}.massDelete')->defaults('label', 'Mass Delete {$className}');
+                    Route::post('/$routePath/export', [{$className}Controller::class, 'massExport'])
+                        ->name('{$routeName}.export')->defaults('label', 'Mass Export {$className}');
                 PHP;
             }
         

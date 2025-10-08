@@ -8,7 +8,7 @@
     <div class="input-group">
         <select
             id="filter-{{ $name }}"
-            name="filters[{{ $name }}]"
+            name="filter[{{ $name }}]"
             class="form-select"
         >
             <option value="">-- Select --</option>
