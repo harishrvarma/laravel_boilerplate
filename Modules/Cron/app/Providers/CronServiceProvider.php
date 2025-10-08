@@ -43,7 +43,12 @@ class CronServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Modules\Cron\Console\GenerateSchedules::class,
+                \Modules\Cron\Console\RunScheduledCrons::class,
+            ]);
+        }
     }
 
     /**

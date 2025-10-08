@@ -1,18 +1,23 @@
 <?php
- 
+
 namespace Modules\Cron\View\Components\Cron\Listing\Grid\Columns;
- 
+
 use Modules\Core\View\Components\Listing\Grid\Columns\Renderer;
 
 class Schedule extends Renderer
 {
     protected $template = 'cron::components.listing.grid.columns.schedule';
 
+    public function value($columnName)
+    {
+        $row = $this->row;
 
-    public function value($columnName){
-        if(isset($this->row->schedule->$columnName)){
-            return $this->row->schedule->$columnName;
+        // Only handle cron_id column
+        if ($columnName === 'cron_id' && $row->cron_id) {
+            // Fetch cron name via relation
+            return $row->cron ? $row->cron->name : null;
         }
-        return null;
-   }
+
+        return $row->$columnName ?? null;
+    }
 }
