@@ -15,14 +15,24 @@ $user = auth('admin')->user();
 
 $menuTree = App::make('menu.cache')->getGlobal();
 
-// Recursive renderer
+// Recursive renderer with ordering
 function renderMenuTree($items) {
+    usort($items, function($a, $b) {
+        return ($a['order_no'] ?? 0) <=> ($b['order_no'] ?? 0);
+    });
+
     foreach ($items as $menu) {
         $hasChildren = !empty($menu['children']);
 
+        // If there are children, sort them recursively
+        if ($hasChildren) {
+            usort($menu['children'], function($a, $b) {
+                return ($a['order_no'] ?? 0) <=> ($b['order_no'] ?? 0);
+            });
+        }
+
         $routeName = $menu['resource']['route_name'] ?? null;
 
-        // Only generate URL if route exists and has no required parameters
         $routeUrl = '#';
         if ($routeName && \Route::has($routeName)) {
             $route = \Route::getRoutes()->getByName($routeName);
@@ -62,6 +72,7 @@ function renderMenuTree($items) {
     }
 }
 @endphp
+
 
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="#" class="brand-link">

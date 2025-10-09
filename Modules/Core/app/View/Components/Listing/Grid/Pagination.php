@@ -22,7 +22,7 @@ class Pagination extends Block
         $this->params    = $params;
         $this->perPage   = $perPage;
         $this->grid      = $grid;
-        $this->perPageOptions = !empty($perPageOptions) ? $perPageOptions : [1, 2, 3, 4, 5, 10];
+        $this->perPageOptions = !empty($perPageOptions) ? $perPageOptions : [5, 10, 20, 30, 40, 50];
     }
  
     public function queryString(array $extra = []): string

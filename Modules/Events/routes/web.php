@@ -17,6 +17,7 @@ Route::prefix('admin')->group(function(){
         Route::get('/event/edit/{id}', [EventsController::class, 'edit'])->name('admin.event.edit')->defaults('label', 'Edit Event');
         Route::get('/event/delete/{id}', [EventsController::class,'delete'])->name('admin.event.delete')->defaults('label', 'Delete Event');
         Route::post('/event/massDelete', [EventsController::class,'massDelete'])->name('admin.event.massDelete')->defaults('label', 'Mass Delete Event');
+        Route::post('/event/export', [EventsController::class,'massExport'])->name('admin.event.export')->defaults('label', 'Mass Export Event');
 
         Route::match(['GET','POST'], '/listener/listing/{event_id}', [ListenerController::class,'listing'])
         ->name('admin.listener.listing')->defaults('label', 'Event Listener Listing');

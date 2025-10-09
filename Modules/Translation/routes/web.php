@@ -15,7 +15,6 @@ Route::prefix('admin')->group(function(){
         Route::get('/translation/edit/{id}', [TranslationController::class, 'edit'])->name('admin.translation.edit')->defaults('label', 'Edit Translation');
         Route::get('/translation/delete/{id}', [TranslationController::class,'delete'])->name('admin.translation.delete')->defaults('label', 'Delete Translation');
         Route::post('/translation/massDelete', [TranslationController::class,'massDelete'])->name('admin.translation.massDelete')->defaults('label', 'Mass Delete Translation');
-
+        Route::post('/translation/export', [TranslationController::class,'massExport'])->name('admin.translation.export')->defaults('label', 'Mass Export Translation');
     });
-    
 });

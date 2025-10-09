@@ -14,6 +14,7 @@ Route::prefix('admin')->group(function(){
         Route::get('/cron/edit/{id}', [CronController::class, 'edit'])->name('admin.cron.edit')->defaults('label', 'Edit Cron');
         Route::get('/cron/delete/{id}', [CronController::class,'delete'])->name('admin.cron.delete')->defaults('label', 'Delete Cron');
         Route::post('/cron/massDelete', [CronController::class,'massDelete'])->name('admin.cron.massDelete')->defaults('label', 'Mass Delete Cron');
+        Route::post('/cron/export', [CronController::class,'massExport'])->name('admin.cron.export')->defaults('label', 'Mass Export Cron');
         Route::get('/cron/run/{id}', [CronController::class,'run'])->name('admin.cron.run')->defaults('label', 'Run Cron');
     });
 });

@@ -68,6 +68,14 @@ class Grid extends CoreGrid
                 'url' => 'admin.apirole.massDelete',
             ]);
         }
+
+        if (canAccess('admin.apirole.export')) {
+            $this->massAction('export', [
+                'value' => 'mass_export',
+                'label' => 'Export',
+                'url' => 'admin.apirole.export',
+            ]);
+        }
     }
 
     public function prepareFilters()

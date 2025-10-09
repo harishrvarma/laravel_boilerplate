@@ -157,8 +157,7 @@ class CronController extends BackendController
                 $result = $object->{$cron->method}();
                 $output = is_string($result) ? $result : json_encode($result);
             } elseif ($cron->command) {
-                Artisan::call($cron->command);
-                $output = Artisan::output();
+                $output = shell_exec('php8.4 ' . base_path('artisan') . ' ' . escapeshellarg($cron->command) . ' 2>&1');
             } else {
                 throw new Exception("No valid command or class-method defined for this cron");
             }
@@ -190,6 +189,56 @@ class CronController extends BackendController
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    public function massExport(Request $request)
+    {
+        $ids = $request->input('mass_ids', []);
     
+        // Get visible columns
+        $columns = $request->input('visible_columns', '');
+        $columns = $columns ? explode(',', $columns) : ['id'];
+        $columns = array_unique($columns);
+    
+        // Get table columns from DB
+        $tableColumns = (new Cron)->getConnection()->getSchemaBuilder()->getColumnListing((new Cron)->getTable());
+    
+        // Keep only columns that exist in DB
+        $columns = array_intersect($columns, $tableColumns);
+    
+        // Build query
+        $query = Cron::query();
+    
+        if (!empty($ids)) {
+            $query->whereIn('id', $ids);
+        }
+    
+        $records = $query->get($columns);
+    
+        $filename = 'export_' . date('Y-m-d_H-i-s') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+    
+        $callback = function() use ($records, $columns) {
+            $file = fopen('php://output', 'w');
+    
+            // Header row
+            fputcsv($file, $columns);
+    
+            // Data rows
+            foreach ($records as $record) {
+                $row = [];
+                foreach ($columns as $col) {
+                    $row[] = $record->{$col};
+                }
+                fputcsv($file, $row);
+            }
+    
+            fclose($file);
+        };
+    
+        return response()->stream($callback, 200, $headers);
+    }
 }
 
