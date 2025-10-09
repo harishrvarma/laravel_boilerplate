@@ -310,5 +310,4 @@ class MenuController extends BackendController
     
         return response()->stream($callback, 200, $headers);
     }
-
 }

@@ -18,6 +18,7 @@ Route::prefix('admin')->group(function(){
         Route::get('/admin/edit/{id}', [AdminController::class, 'edit'])->name('admin.admin.edit')->defaults('label', 'Edit Admin User');
         Route::get('/admin/delete/{id}', [AdminController::class,'delete'])->name('admin.admin.delete')->defaults('label', 'Delete Admin User');
         Route::post('/admin/massDelete', [AdminController::class,'massDelete'])->name('admin.admin.massDelete')->defaults('label', 'Mass Delete Admin User');
+        Route::post('/admin/export', [AdminController::class,'massExport'])->name('admin.admin.export')->defaults('label', 'Mass Export Admin User');
 
 
         Route::match(['GET','POST'], '/role/listing', [RoleController::class,'listing'])
@@ -27,7 +28,7 @@ Route::prefix('admin')->group(function(){
         Route::get('/role/edit/{id}', [RoleController::class,'edit'])->name('admin.role.edit')->defaults('label', 'Edit Admin Role');
         Route::get('/role/delete/{id}', [RoleController::class,'delete'])->name('admin.role.delete')->defaults('label', 'Delete Admin Role');
         Route::post('/role/massDelete', [RoleController::class,'massDelete'])->name('admin.role.massDelete')->defaults('label', 'Mass Delete Admin Role');
-
+        Route::post('/role/export', [RoleController::class,'massExport'])->name('admin.role.export')->defaults('label', 'Mass Export Admin Role');
 
         Route::match(['GET','POST'], '/resource/listing', [ResourceController::class,'listing'])
         ->name('admin.resource.listing')->defaults('label', 'Admin Resource Listing');

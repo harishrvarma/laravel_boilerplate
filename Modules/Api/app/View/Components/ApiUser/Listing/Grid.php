@@ -75,7 +75,14 @@ class Grid extends CoreGrid
                 'url' => 'admin.apiuser.massDelete',
             ]);
         }
-    
+
+        if (canAccess('admin.apiuser.export')) {
+            $this->massAction('export', [
+                'value' => 'mass_export',
+                'label' => 'Export',
+                'url' => 'admin.apiuser.export',
+            ]);
+        }
     }
 
     public function prepareFilters()

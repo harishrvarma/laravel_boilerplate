@@ -4,11 +4,13 @@
 <div class="card shadow-sm">
     <div class="card-header d-flex align-items-center justify-content-between">
         {{-- Left side: select actions --}}
-        <div class="d-flex align-items-center gap-2">
-            <a href="{{ urlx(null,['selectAll' => 1]) }}" class="text-decoration-none">Select All</a>
-            <span>|</span>
-            <a href="{{ urlx(null,['selectAll' => 0]) }}" class="text-decoration-none">Unselect All</a>
-        </div>
+        @if ($me->massActions() && count($me->massActions()) > 1)
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ urlx(null,['selectAll' => 1]) }}" class="text-decoration-none">Select All</a>
+                <span>|</span>
+                <a href="{{ urlx(null,['selectAll' => 0]) }}" class="text-decoration-none">Unselect All</a>
+            </div>
+        @endif
 
 
         {{-- Right side: custom buttons --}}

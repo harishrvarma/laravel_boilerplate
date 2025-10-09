@@ -17,6 +17,7 @@ Route::prefix('admin')->group(function(){
         Route::get('/apiuser/edit/{id}', [ApiUserController::class,'edit'])->name('admin.apiuser.edit')->defaults('label', 'Edit Api User');
         Route::get('/apiuser/delete/{id}', [ApiUserController::class,'delete'])->name('admin.apiuser.delete')->defaults('label', 'Delete Api User');
         Route::post('/apiuser/massDelete', [ApiUserController::class,'massDelete'])->name('admin.apiuser.massDelete')->defaults('label', 'Mass Delete Api User');
+        Route::post('/apiuser/export', [ApiUserController::class,'massExport'])->name('admin.apiuser.export')->defaults('label', 'Mass Export Api User');
 
 
         Route::match(['GET','POST'], '/apirole/listing', [ApiRoleController::class,'listing'])
@@ -26,7 +27,7 @@ Route::prefix('admin')->group(function(){
         Route::get('/apirole/edit/{id}', [ApiRoleController::class,'edit'])->name('admin.apirole.edit')->defaults('label', 'Edit Api Role');
         Route::get('/apirole/delete/{id}', [ApiRoleController::class,'delete'])->name('admin.apirole.delete')->defaults('label', 'Delete Api Role');
         Route::post('/apirole/massDelete', [ApiRoleController::class,'massDelete'])->name('admin.apirole.massDelete')->defaults('label', 'Mass Delete Api Role');
-
+        Route::post('/apirole/export', [ApiRoleController::class,'massExport'])->name('admin.apirole.export')->defaults('label', 'Mass Export Api Role');
 
         Route::match(['GET','POST'], '/apiresource/listing', [ApiResourceController::class,'listing'])
         ->name('admin.apiresource.listing')->defaults('label', 'Api Resource Listing');

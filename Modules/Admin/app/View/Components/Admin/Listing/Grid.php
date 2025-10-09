@@ -116,6 +116,14 @@ class Grid extends CoreGrid
                 'url' => 'admin.admin.massDelete',
             ]);
         }
+
+        if (canAccess('admin.admin.export')) {
+            $this->massAction('export', [
+                'value' => 'mass_export',
+                'label' => 'Export',
+                'url' => 'admin.admin.export',
+            ]);
+        }
     }
     
     public function prepareCollection() 
