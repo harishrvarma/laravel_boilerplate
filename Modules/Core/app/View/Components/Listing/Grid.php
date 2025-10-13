@@ -15,6 +15,7 @@ class Grid extends Block
     protected $sortDir = 'asc';
     protected $totalCount = 0;
     protected $allowedPagination = true;
+    protected $moduleName = null;
  
     protected $title = null;
     // Plural
@@ -203,7 +204,6 @@ class Grid extends Block
         return $query;
     }
     
-
 
     public function filter(string $key, array $value = null, bool $reset = false)
     {
@@ -542,5 +542,29 @@ class Grid extends Block
             return $this;
         }
         return $this->title;
+    }
+
+    protected function handleHiddenColumns()
+    {
+        $module = $this->moduleName();
+        $sessionKey = "hidden_columns_{$module}";
+    
+        if (request()->has('columns')) {
+            $checkedColumns = request()->get('columns', []);
+            $allColumns = array_keys($this->columns());
+            $hiddenColumns = array_diff($allColumns, $checkedColumns);
+    
+            session([$sessionKey => $hiddenColumns]);
+        }
+    
+        return session($sessionKey, []);
+    }
+
+    public function moduleName(string $moduleName = null){
+        if(!is_null($moduleName)){
+            $this->moduleName = $moduleName;
+            return $this;
+        }
+        return $this->moduleName;
     }
 }

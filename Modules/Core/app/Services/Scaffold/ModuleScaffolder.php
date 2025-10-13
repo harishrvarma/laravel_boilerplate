@@ -355,30 +355,45 @@ class ModuleScaffolder
             $routes = [];
         
             foreach ($tables as $tbl) {
-                // Compute segments and class
-                $segments = $this->computeSegments($tbl['name'], !empty($tbl['ignore_module_prefix']));
+                // Compute segments and class name
+                $rawSegments = $this->computeSegments($tbl['name'], !empty($tbl['ignore_module_prefix']));
                 $className = $this->computeClassName($tbl['name'], true);
         
-                // Prepend module name
-                $segments = array_merge([strtolower($this->module)], $segments);
+                // Ensure module prefix only once
+                $moduleLower = strtolower($this->module);
+                $segments = $rawSegments;
+                if (empty($segments) || strcasecmp($segments[0], $moduleLower) !== 0) {
+                    array_unshift($segments, $moduleLower);
+                }
         
-                // Compute paths
+                // Compute paths (use segments as-is)
                 $paths = $this->computePaths($segments, $tbl['path_mode']);
+                $tablePath = $paths['tablePath'] ?? '';
         
-                // Fully qualified controller
-                $controllerFqn = "Modules\\{$this->module}\\Http\\Controllers\\Api\\V1"
-                               . ($paths['tablePath'] ? "\\" . str_replace('/', '\\', $paths['tablePath']) : '')
-                               . "\\{$className}Controller";
+                // Normalize tablePath parts and remove any module duplicates
+                $tablePathParts = array_filter(explode('/', $tablePath), fn($p) => $p !== '' && trim($p) !== null);
+                // remove parts equal to module (case-insensitive)
+                $tablePathParts = array_values(array_filter($tablePathParts, function ($p) use ($moduleLower) {
+                    return strcasecmp($p, $moduleLower) !== 0;
+                }));
         
-                if (!in_array("use {$controllerFqn};", $controllerUses)) {
-                    $controllerUses[] = "use {$controllerFqn};";
+                // Convert to namespace portion (backslashes), preserve case from parts
+                $namespaceSuffix = $tablePathParts ? '\\' . implode('\\', $tablePathParts) : '';
+        
+                // Build fully qualified controller name under Api\V1
+                $controllerFqn = "Modules\\{$this->module}\\Http\\Controllers\\Api\\V1" . $namespaceSuffix . "\\{$className}Controller";
+        
+                // register use import
+                $useLine = "use {$controllerFqn};";
+                if (!in_array($useLine, $controllerUses, true)) {
+                    $controllerUses[] = $useLine;
                 }
         
                 // Route prefix and name
-                $prefix = strtolower(implode('/', $segments));
-                $routeName = implode('.', $segments);
+                $prefix = strtolower(implode('/', $segments)); // e.g. service/category
+                $routeName = implode('.', $segments);          // e.g. service.category
         
-                // Build route block
+                // Build route group block (same style as your original)
                 $routeBlock = "Route::middleware(['auth:api'])->prefix('v1/{$prefix}')->group(function () {\n";
                 $routeBlock .= "    Route::get('/listing', [{$className}Controller::class,'listing'])"
                             . "->name('api.{$routeName}.listing')->middleware('scope:api.{$routeName}.listing')->defaults('label', '{$className} Listing');\n";
@@ -391,6 +406,7 @@ class ModuleScaffolder
                 $routes[] = $routeBlock;
             }
         
+            // Render/write the file (same pattern as your existing code path)
             $targetFile = $this->basePath . '/' . str_replace(array_keys($replacements), array_values($replacements), $targetPattern);
         
             if (!file_exists($targetFile)) {
@@ -405,12 +421,14 @@ class ModuleScaffolder
             } else {
                 $existing = file_get_contents($targetFile);
         
+                // Add missing controller uses (after <?php)
                 foreach ($controllerUses as $use) {
                     if (strpos($existing, $use) === false) {
                         $existing = preg_replace('/(<\?php\s+)/', "$1\n$use\n", $existing, 1);
                     }
                 }
         
+                // Append only new routes
                 $newRoutes = '';
                 foreach ($routes as $route) {
                     if (strpos($existing, $route) === false) {
@@ -419,6 +437,7 @@ class ModuleScaffolder
                 }
         
                 if ($newRoutes) {
+                    // keep simple: append new route blocks at file end
                     $existing .= "\n" . $newRoutes;
                     file_put_contents($targetFile, $existing);
                     echo "♻️ Appended API routes to: {$targetFile}\n";
@@ -605,8 +624,6 @@ class ModuleScaffolder
     {
         $lines = [];
         foreach ($fields as $field) {
-            if (!empty($field['primary']) && $field['primary'] === true) continue;
-
             $label = ucfirst(str_replace('_', ' ', $field['name']));
             $lines[] = "\$this->column('{$field['name']}', [
                             'name' => '{$field['name']}',

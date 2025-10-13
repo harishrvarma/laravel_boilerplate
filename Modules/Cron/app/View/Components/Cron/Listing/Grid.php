@@ -148,6 +148,7 @@ class Grid extends CoreGrid
 
     public function prepareCollection() 
     {
+        $this->moduleName = 'Cron';
         $query = Cron::query();
 
         if($this->sortColumn() && $this->sortDir()){
@@ -155,6 +156,12 @@ class Grid extends CoreGrid
         }
 
         $this->applyFilters($query);
+        $hiddenColumns = $this->handleHiddenColumns();
+        if (!empty($hiddenColumns)) {
+            $allColumns = array_values(array_diff(array_keys($this->columns()), ['mass_ids']));
+            $visibleColumns = array_diff($allColumns, $hiddenColumns);
+            $query->select($visibleColumns);
+        }
         $this->pager($query);
 
         $this->collection = $query->get();
