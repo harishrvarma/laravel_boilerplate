@@ -158,7 +158,7 @@ class Grid extends CoreGrid
 
     public function prepareCollection()
     {
-        $this->moduleName = 'Menu';
+        $this->gridKey = 'Menu';
         $menu = $this->model(Menu::class);
         $query = $menu->query();
 
@@ -168,7 +168,7 @@ class Grid extends CoreGrid
 
         $this->applyFilters($query);
 
-        $hiddenColumns = $this->handleHiddenColumns();
+        $hiddenColumns = $this->handleHiddenColumns($menu->getKeyName());
         if (!empty($hiddenColumns)) {
             $allColumns = array_values(array_diff(array_keys($this->columns()), ['mass_ids']));
             $visibleColumns = array_diff($allColumns, $hiddenColumns);

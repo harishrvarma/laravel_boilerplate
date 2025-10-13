@@ -100,14 +100,14 @@ class Grid extends CoreGrid
     
     public function prepareCollection() 
     {
-        $this->moduleName = 'Event';
+        $this->gridKey = 'Event';
         $admin = $this->model(Event::class);
         $query = $admin->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());
         }
         $this->applyFilters($query);
-        $hiddenColumns = $this->handleHiddenColumns();
+        $hiddenColumns = $this->handleHiddenColumns($admin->getKeyName());
         if (!empty($hiddenColumns)) {
             $allColumns = array_values(array_diff(array_keys($this->columns()), ['mass_ids']));
             $visibleColumns = array_diff($allColumns, $hiddenColumns);

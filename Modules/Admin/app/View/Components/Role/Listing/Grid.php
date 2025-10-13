@@ -114,14 +114,14 @@ class Grid extends CoreGrid
     
     public function prepareCollection() 
     {
-        $this->moduleName = 'Admin_Role';
+        $this->gridKey = 'Admin_Role';
         $role = $this->model(Role::class);
         $query = $role->query();
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());
         }
         $this->applyFilters($query);
-        $hiddenColumns = $this->handleHiddenColumns();
+        $hiddenColumns = $this->handleHiddenColumns($role->getKeyName());
         if (!empty($hiddenColumns)) {
             $allColumns = array_values(array_diff(array_keys($this->columns()), ['mass_ids']));
             $visibleColumns = array_diff($allColumns, $hiddenColumns);

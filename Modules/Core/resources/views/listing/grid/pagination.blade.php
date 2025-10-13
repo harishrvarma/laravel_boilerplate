@@ -6,8 +6,7 @@
         @if ($paginator->onFirstPage())
             <span class="btn btn-outline-secondary btn-sm disabled">‹ Prev</span>
         @else
-            <a href="{{ $grid->urlx(null, ['page' => $paginator->currentPage() - 1]) }}" 
-               class="btn btn-outline-primary btn-sm">‹ Prev</a>
+            <a href="#" class="btn btn-outline-primary btn-sm pagination-link" data-page="{{ $paginator->currentPage() - 1 }}">‹ Prev</a>
         @endif
     </div>
 
@@ -22,11 +21,11 @@
                class="form-control form-control-sm text-center"
                style="width:60px;">
     </div>
+    <input type="hidden" name="page" id="pageInput" value="{{ $paginator->currentPage() }}">
     {{-- Next Button --}}
     <div>
         @if ($paginator->hasMorePages())
-            <a href="{{ $grid->urlx(null, ['page' => $paginator->currentPage() + 1]) }}" 
-               class="btn btn-outline-primary btn-sm">Next ›</a>
+            <a href="#" class="btn btn-outline-primary btn-sm pagination-link" data-page="{{ $paginator->currentPage() + 1 }}">Next ›</a>
         @else
             <span class="btn btn-outline-secondary btn-sm disabled">Next ›</span>
         @endif
@@ -38,8 +37,7 @@
     <div class="d-flex align-items-center gap-2">
         <label for="per_page" class="mb-0 small">View:</label>
         <select name="per_page" id="per_page" 
-                class="form-select form-select-sm w-auto"
-                onchange="window.location.href=urlx(null,{per_page:this.value,page:1})">
+                class="form-select form-select-sm w-auto">
             @foreach($perPageOptions as $option)
                 <option value="{{ $option }}" {{ $paginator->perPage() == $option ? 'selected' : '' }}>
                     {{ $option }}
@@ -51,3 +49,24 @@
     <span class="small">Total {{ $paginator->total() }} Records</span>
 </div>
 @endif
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // Pagination
+        $('.pagination-link').click(function(e) {
+            e.preventDefault();
+            var page = $(this).data('page');
+            console.log(page);
+            $('#pageInput').val(page);      // set hidden page input
+            $('#main-form').submit();        // submit main form via POST
+        });
+
+         $('#per_page').change(function() {
+            var value = $(this).val();
+            $('#pageInput').val(1); // reset page to 1 when changing per_page
+            $('#main-form').submit(); // submit via POST
+        });
+    });
+
+</script>
+@endpush

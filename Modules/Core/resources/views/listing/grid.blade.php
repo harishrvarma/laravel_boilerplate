@@ -1,11 +1,21 @@
 @php
+$rows = $me->rows();
+$primaryKey = null;
+
+if ($rows && $rows->isNotEmpty()) {
+    $primaryKey = $rows->first()->getKeyName();
+}
     $dropdownColumns = [];
-    foreach($me->columns() as $key => $column) {
-        if ($key !== 'mass_ids' && !in_array($column['name'], array_column($dropdownColumns, 'name'))) {
+    foreach ($me->columns() as $key => $column) {
+        if (
+            $key !== 'mass_ids' &&
+            $key !== $primaryKey &&
+            !in_array($column['name'], array_column($dropdownColumns, 'name'))
+        ) {
             $dropdownColumns[$key] = $column;
         }
     }
-    $module = $me->moduleName();
+    $module = $me->gridKey();
     $hiddenColumns = session("hidden_columns_{$module}", []);
 @endphp
 <div class="col-sm-6">
@@ -15,11 +25,12 @@
     <div class="card-header d-flex align-items-center justify-content-between">
         {{-- Left side: select actions --}}
         @if ($me->massActions() && count($me->massActions()) > 1)
-            <div class="d-flex align-items-center gap-2">
-                <a href="{{ urlx(null,['selectAll' => 1]) }}" class="text-decoration-none">Select All</a>
-                <span>|</span>
-                <a href="{{ urlx(null,['selectAll' => 0]) }}" class="text-decoration-none">Unselect All</a>
-            </div>
+        <input type="hidden" name="selectAll" id="selectAllInput" value="{{ request()->input('selectAll', 0) }}">
+        <div class="d-flex align-items-center gap-2">
+            <a class="text-decoration-none select-all-link" data-value="1">Select All</a>
+            <span>|</span>
+            <a class="text-decoration-none select-all-link" data-value="0">Unselect All</a>
+        </div>
         @endif
 
         {{-- Right side: custom buttons --}}
@@ -63,6 +74,7 @@
             </div>
         @endif
         {{-- Right: Columns Dropdown --}}
+        <input type="hidden" name="columns[]" value="">
         <div class="dropdown ml-auto">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="columnsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Columns
@@ -133,7 +145,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($me->rows() as $row)
+                @forelse($rows as $row)
                     <tr>
                         @foreach($me->columns() as $column)
                             @if(!in_array($column['name'], $hiddenColumns))
@@ -237,6 +249,16 @@
             $(this).closest('form').submit();
         }
     });
+
+    $(document).ready(function() {
+        $('.select-all-link').click(function(e) {
+            e.preventDefault();            // prevent default link behavior
+            var value = $(this).data('value');
+            $('#selectAllInput').val(value);
+            $('#main-form').submit();      // corrected ID
+        });
+    });
+
 
 </script>
 @endpush
