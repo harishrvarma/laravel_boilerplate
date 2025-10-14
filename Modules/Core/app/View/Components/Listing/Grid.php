@@ -15,6 +15,7 @@ class Grid extends Block
     protected $sortDir = 'asc';
     protected $totalCount = 0;
     protected $allowedPagination = true;
+    protected $gridKey = null;
  
     protected $title = null;
     // Plural
@@ -120,7 +121,7 @@ class Grid extends Block
                 ->forPage($this->page(), $this->perPage())
                 ->get();
     
-            $selectAll = (int) request()->get('selectAll', 0);
+            $selectAll = (int) request()->input('selectAll', 0);
             
             if ($selectAll === 1) {
                 foreach ($this->rows as $row) {
@@ -204,7 +205,6 @@ class Grid extends Block
     }
     
 
-
     public function filter(string $key, array $value = null, bool $reset = false)
     {
         if(is_null($key)){
@@ -248,7 +248,7 @@ class Grid extends Block
 
     public function perPage()
     {
-        $perPage = (int)request('per_page',$this->perPage);
+        $perPage = (int) request()->input('per_page', $this->perPage);
 
         if ($perPage <= 0) {
             $perPage = $this->perPage;
@@ -260,7 +260,7 @@ class Grid extends Block
 
     public function page()
     {
-        $page = (int)request('page',$this->page);
+        $page = (int) request()->input('page', $this->page);
 
         if ( $page <= 0) {
             $page = $this->page;
@@ -542,5 +542,31 @@ class Grid extends Block
             return $this;
         }
         return $this->title;
+    }
+
+    protected function handleHiddenColumns($primaryKey = 'id')
+    {
+        $module = $this->gridKey();
+        $sessionKey = "hidden_columns_{$module}";
+        
+        if (request()->has('columns')) {
+            $checkedColumns = request()->get('columns', []);
+            $allColumns = array_keys($this->columns());
+            $exclude = array_filter(['mass_ids', $primaryKey]);
+            $filteredColumns = array_diff($allColumns, $exclude);
+            $hiddenColumns = array_diff($filteredColumns, $checkedColumns);
+            session([$sessionKey => $hiddenColumns]);
+        }
+    
+        return session($sessionKey, []);
+    }
+    
+
+    public function gridKey(string $gridKey = null){
+        if(!is_null($gridKey)){
+            $this->gridKey = $gridKey;
+            return $this;
+        }
+        return $this->gridKey;
     }
 }

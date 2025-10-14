@@ -148,13 +148,21 @@ class Grid extends CoreGrid
 
     public function prepareCollection() 
     {
+        $this->gridKey = 'Cron';
         $query = Cron::query();
+        $cron = $this->model(Cron::class);
 
         if($this->sortColumn() && $this->sortDir()){
              $query->orderBy($this->sortColumn(), $this->sortDir());
         }
 
         $this->applyFilters($query);
+        $hiddenColumns = $this->handleHiddenColumns($cron->getKeyName());
+        if (!empty($hiddenColumns)) {
+            $allColumns = array_values(array_diff(array_keys($this->columns()), ['mass_ids']));
+            $visibleColumns = array_diff($allColumns, $hiddenColumns);
+            $query->select($visibleColumns);
+        }
         $this->pager($query);
 
         $this->collection = $query->get();

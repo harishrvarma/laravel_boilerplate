@@ -1,3 +1,23 @@
+@php
+$rows = $me->rows();
+$primaryKey = null;
+
+if ($rows && $rows->isNotEmpty()) {
+    $primaryKey = $rows->first()->getKeyName();
+}
+    $dropdownColumns = [];
+    foreach ($me->columns() as $key => $column) {
+        if (
+            $key !== 'mass_ids' &&
+            $key !== $primaryKey &&
+            !in_array($column['name'], array_column($dropdownColumns, 'name'))
+        ) {
+            $dropdownColumns[$key] = $column;
+        }
+    }
+    $module = $me->gridKey();
+    $hiddenColumns = session("hidden_columns_{$module}", []);
+@endphp
 <div class="col-sm-6">
         <h2 class="mb-3">{{ $me->title() }}</h2>
     </div>
@@ -5,13 +25,13 @@
     <div class="card-header d-flex align-items-center justify-content-between">
         {{-- Left side: select actions --}}
         @if ($me->massActions() && count($me->massActions()) > 1)
-            <div class="d-flex align-items-center gap-2">
-                <a href="{{ urlx(null,['selectAll' => 1]) }}" class="text-decoration-none">Select All</a>
-                <span>|</span>
-                <a href="{{ urlx(null,['selectAll' => 0]) }}" class="text-decoration-none">Unselect All</a>
-            </div>
+        <input type="hidden" name="selectAll" id="selectAllInput" value="{{ request()->input('selectAll', 0) }}">
+        <div class="d-flex align-items-center gap-2">
+            <a class="text-decoration-none select-all-link" data-value="1">Select All</a>
+            <span>|</span>
+            <a class="text-decoration-none select-all-link" data-value="0">Unselect All</a>
+        </div>
         @endif
-
 
         {{-- Right side: custom buttons --}}
         @if($me->buttons())
@@ -53,6 +73,28 @@
                 @endif
             </div>
         @endif
+        {{-- Right: Columns Dropdown --}}
+        <input type="hidden" name="columns[]" value="">
+        <div class="dropdown ml-auto">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="columnsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Columns
+            </button>
+            <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="columnsDropdown" style="min-width: 220px;">
+
+                    @foreach($dropdownColumns as $key => $column)
+                        <div class="form-check">
+                            <input class="form-check-input column-checkbox" type="checkbox"
+                                name="columns[]" value="{{ $key }}"
+                                id="col_{{ $key }}"
+                                {{ !in_array($key, $hiddenColumns) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="col_{{ $key }}">
+                                {{ $column['label'] }}
+                            </label>
+                        </div>
+                    @endforeach
+                    <button type="submit" class="btn btn-primary btn-sm mt-2 w-100">Apply</button>
+            </div>
+        </div>
     </div>
 
     {{-- Table --}}
@@ -61,38 +103,40 @@
             <thead class="thead-light">
                 <tr>
                     @foreach($me->columns() as $column)
-                    <th class="text-start">
-                        <div class="d-flex align-items-center justify-content-between">
-                            {{-- Sortable --}}
-                            @if(isset($column['sortable']) && $column['sortable'])
-                                <a href="{{ $me->urlx(null,[
-                                    'sortcolumn' => $column['name'],
-                                    'sortdir'    => ($me->sortColumn() === $column['name'] && $me->sortDir() === 'asc') ? 'desc' : 'asc'
-                                ]) }}" class="text-dark text-decoration-none d-flex align-items-center">
-                                    <span>{{ $column['label'] }}</span>
-                                    @if(request('sortcolumn') == $column['name'])
-                                        <small class="ms-1">{{ request('sortdir') == 'asc' ? '▲' : '▼' }}</small>
+                        @if(!in_array($column['name'], $hiddenColumns))
+                            <th class="text-start">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    {{-- Sortable --}}
+                                    @if(isset($column['sortable']) && $column['sortable'])
+                                        <a href="{{ $me->urlx(null, [
+                                            'sortcolumn' => $column['name'],
+                                            'sortdir'    => ($me->sortColumn() === $column['name'] && $me->sortDir() === 'asc') ? 'desc' : 'asc'
+                                        ]) }}" class="text-dark text-decoration-none d-flex align-items-center">
+                                            <span>{{ $column['label'] }}</span>
+                                            @if(request('sortcolumn') == $column['name'])
+                                                <small class="ms-1">{{ request('sortdir') == 'asc' ? '▲' : '▼' }}</small>
+                                            @endif
+                                        </a>
+                                    @else
+                                        <span>{{ $column['label'] }}</span>
                                     @endif
-                                </a>
-                            @else
-                                <span>{{ $column['label'] }}</span>
-                            @endif
 
-                            {{-- Filter --}}
-                            @php $filter = $me->filter($column['name']); @endphp
-                            @if($filter)
-                                <div class="dropdown ms-2">
-                                    <button class="btn btn-sm {{ request('filter.' . $column['name']) ? 'btn-warning' : 'btn-secondary' }}"
-                                            type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                        <i class="fas fa-filter"></i>
-                                    </button>
-                                    <div class="dropdown-menu p-3" style="min-width:250px;">
-                                        {!! $me->getFilterBlock($column,$filter)->render() !!}
-                                    </div>
+                                    {{-- Filter --}}
+                                    @php $filter = $me->filter($column['name']); @endphp
+                                    @if($filter)
+                                        <div class="dropdown ms-2">
+                                            <button class="btn btn-sm {{ request('filter.' . $column['name']) ? 'btn-warning' : 'btn-secondary' }}"
+                                                    type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                                <i class="fas fa-filter"></i>
+                                            </button>
+                                            <div class="dropdown-menu p-3" style="min-width:250px;">
+                                                {!! $me->getFilterBlock($column,$filter)->render() !!}
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
-                            @endif
-                        </div>
-                    </th>
+                            </th>
+                        @endif
                     @endforeach
 
                     @if(!empty($me->actions()))
@@ -100,18 +144,19 @@
                     @endif
                 </tr>
             </thead>
-
             <tbody>
-                @forelse($me->rows() as $row)
+                @forelse($rows as $row)
                     <tr>
                         @foreach($me->columns() as $column)
-                            <td>
-                                @if(isset($column['columnClassName']))
-                                    {!! $me->getRendererBlock($column,$row)->render() !!}
-                                @else
-                                    {{ $row->{$column['name']} }}
-                                @endif
-                            </td>
+                            @if(!in_array($column['name'], $hiddenColumns))
+                                <td>
+                                    @if(isset($column['columnClassName']))
+                                        {!! $me->getRendererBlock($column,$row)->render() !!}
+                                    @else
+                                        {{ $row->{$column['name']} }}
+                                    @endif
+                                </td>
+                            @endif
                         @endforeach
 
                         @if(!empty($me->actions()))
@@ -124,7 +169,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ count($me->columns()) + (empty($me->actions()) ? 0 : 1) }}" class="text-center">
+                        <td colspan="{{ count($me->columns()) + (!empty($me->actions()) ? 1 : 0) }}" class="text-center">
                             No records found.
                         </td>
                     </tr>
@@ -204,6 +249,16 @@
             $(this).closest('form').submit();
         }
     });
+
+    $(document).ready(function() {
+        $('.select-all-link').click(function(e) {
+            e.preventDefault();            // prevent default link behavior
+            var value = $(this).data('value');
+            $('#selectAllInput').val(value);
+            $('#main-form').submit();      // corrected ID
+        });
+    });
+
 
 </script>
 @endpush
