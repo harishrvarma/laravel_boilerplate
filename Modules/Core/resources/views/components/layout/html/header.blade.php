@@ -1,3 +1,7 @@
+@php
+    use Modules\Translation\Models\TranslationLocale;
+    $locales = TranslationLocale::orderBy('id')->get();
+@endphp
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -6,7 +10,26 @@
             </a>
         </li>
     </ul>
+
+    <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-globe"></i> Language
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                @foreach($locales as $locale)
+                    <li>
+                        <a class="dropdown-item" href="{{ url()->current() }}?lang={{ $locale->code }}">
+                            {{ $locale->label }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </li>
+    </ul>
 </nav>
+
 
 @php
 use Illuminate\Support\Facades\App;

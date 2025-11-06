@@ -1,23 +1,34 @@
 @php
-$rows = $me->rows();
-$primaryKey = null;
-
-if ($rows && $rows->isNotEmpty()) {
-    $primaryKey = $rows->first()->getKeyName();
-}
-    $dropdownColumns = [];
-    foreach ($me->columns() as $key => $column) {
-        if (
-            $key !== 'mass_ids' &&
-            $key !== $primaryKey &&
-            !in_array($column['name'], array_column($dropdownColumns, 'name'))
-        ) {
-            $dropdownColumns[$key] = $column;
-        }
+$primaryKey = $me->primaryKey();
+$dropdownColumns = [];
+foreach ($me->columns() as $key => $column) {
+    if (
+        $key !== 'mass_ids' &&
+        $key !== $primaryKey &&
+        !in_array($column['name'], array_column($dropdownColumns, 'name'))
+    ) {
+        $dropdownColumns[$key] = $column;
     }
-    $module = $me->gridKey();
-    $hiddenColumns = session("hidden_columns_{$module}", []);
+}
+$module = $me->gridKey();
+$hiddenColumns = session("hidden_columns_{$module}", []);
 @endphp
+@if(session('success_message'))
+    <div class="alert alert-success">
+        <div style="font-size:15px;">
+            <strong>✅ Module Creator:</strong> {{ session('success_message') }}<br>
+            Please copy the below command and execute it in your console to generate the scaffold module for 
+            <strong>{{ session('module_code') }}</strong> based on the EAV structure.
+        </div>
+
+        <div class='mt-3'>
+            <pre class='mt-2 mb-0 d-inline-block' id="commandText">{{ session('command') }}</pre>
+            <button id='copyCommand' class='btn btn-sm btn-primary ms-2'>
+                <i class='fas fa-copy'></i>
+            </button>
+        </div>
+    </div>
+@endif
 <div class="col-sm-6">
         <h2 class="mb-3">{{ $me->title() }}</h2>
     </div>
@@ -36,12 +47,26 @@ if ($rows && $rows->isNotEmpty()) {
         {{-- Right side: custom buttons --}}
         @if($me->buttons())
             <div class="ms-auto">
-                @foreach ($me->buttons() as $button)
-                    <a href="{{ $button['route'] ?? '#' }}" 
-                       class="btn btn-primary btn-sm">
-                       {{ $button['label'] ?? '' }}
-                    </a>
-                @endforeach
+            @foreach ($me->buttons() as $button)
+                @php
+                    $href = '#';
+                    if (!empty($button['route'])) {
+                        $href = $button['route'];
+                    } elseif (!empty($button['method'])) {
+                        $href = "javascript:void(0)";
+                        $onclick = $button['method'];
+                    } else {
+                        $onclick = '';
+                    }
+                @endphp
+
+                <a href="{{ $href }}" 
+                @if(!empty($onclick)) onclick="{{ $onclick }}" @endif
+                class="btn btn-primary btn-sm">
+                {{ $button['label'] ?? '' }}
+                </a>
+            @endforeach
+
             </div>
         @endif
     </div>
@@ -259,6 +284,25 @@ if ($rows && $rows->isNotEmpty()) {
         });
     });
 
+    $(document).on('click', '#copyCommand', function () {
+        let command = $('#commandText').text().trim();
 
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(command)
+                .then(() => alert('✅ Command copied to clipboard!'))
+                .catch(err => {
+                    console.error(err);
+                    alert('❌ Clipboard permission denied!');
+                });
+        } else {
+            let tempInput = document.createElement("textarea");
+            tempInput.value = command;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert('✅ Command copied to clipboard!');
+        }
+    });
 </script>
 @endpush

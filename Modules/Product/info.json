@@ -1,0 +1,76 @@
+{
+    "module": "Product",
+    "tables": {
+        "product_entity": {
+            "name": "product_entity",
+            "signature": "4b672759d4169beeb2fbf07c698b60dab107f104",
+            "fields": [
+                {
+                    "name": "entity_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "entity_type_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "entity_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        },
+        "product_entity_attribute_value": {
+            "name": "product_entity_attribute_value",
+            "signature": "b80284865793d5f783b843d26e81b3646dc57684",
+            "fields": [
+                {
+                    "name": "value_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "entity_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "attribute_id",
+                    "type": "bigint"
+                },
+                {
+                    "name": "lang_id",
+                    "type": "int",
+                    "nullable": true
+                },
+                {
+                    "name": "value",
+                    "type": "text",
+                    "nullable": true
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "value_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        }
+    },
+    "updated_at": "2025-10-27T12:24:40+00:00"
+}

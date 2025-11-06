@@ -254,18 +254,8 @@ class ModuleScaffolder
                 $segments = $this->computeSegments($tbl['name'], !empty($tbl['ignore_module_prefix']));
                 $className = $this->computeClassName($tbl['name'], true);
             
-                // Determine route "base name"
-                if (count($segments) > 1) {
-                    // For table like product_category, take last segment as base
-                    $routeSegment = strtolower(end($segments));
-                } else {
-                    $routeSegment = strtolower($tbl['name']);
-                }
-            
-                // Compute paths for controller (namespace)
                 $paths = $this->computePaths($segments, $tbl['path_mode']);
             
-                // Build tablePath for namespace (avoid duplicating last segment)
                 $tablePath = $paths['tablePath'];
                 if ($tablePath) {
                     $parts = explode('/', $tablePath);
@@ -282,9 +272,9 @@ class ModuleScaffolder
             
                 $controllerUses[] = "use {$controllerFqn};";
             
-                // Route path and name
-                $routePath = strtolower($routeSegment);
-                $routeName = 'admin.' . $routeSegment;
+                $routePath = strtolower(implode('/', $segments));
+                $routeName = 'admin.' . strtolower(implode('.', $segments));
+
             
                 // Route definitions
                 $routes[] = <<<PHP
@@ -347,8 +337,7 @@ class ModuleScaffolder
         
             return;
         }
-        
-        
+
         if ($type === 'api_routes') {
             $tables = $context['tables'] ?? ($table ? [$table] : []);
             $controllerUses = [];

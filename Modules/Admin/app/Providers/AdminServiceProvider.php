@@ -179,14 +179,10 @@ class AdminServiceProvider extends ServiceProvider
             $code = $route->getName();
             $methods = implode('|', $route->methods());
     
-            // use route default label if available
             $label = $route->defaults['label'] ?? ucfirst(last(explode('.', $code))) ?? $code;
             $newCodes[] = $code;
     
             $this->createResourceTree($route);
-    
-            // Create hierarchical tree with full route
-            
         }
     
         // Deactivate removed routes
@@ -198,58 +194,55 @@ class AdminServiceProvider extends ServiceProvider
         $routeName = $route->getName();
         $parts = explode('.', $routeName);
     
+        // Only process admin-prefixed routes
         if ($parts[0] !== 'admin') {
             return;
         }
     
         $parentId = null;
         $code = '';
-        $pathIds = '';
     
         foreach ($parts as $level => $part) {
-            $code = $code ? $code . '.' . $part : $part;
             $isLast = $level + 1 === count($parts);
-
+    
             if ($level === 0 && $part === 'admin') {
+                $code = 'admin';
                 continue;
             }
     
-            // 👉 Name: only for last part
-            $name = $isLast ? ucfirst(str_replace('_', ' ', $part)) : null;
+            $code = $code ? $code . '.' . $part : 'admin.' . $part;
     
-            // 👉 Label: if route ends with ".*", take the part before "*"
-            if (!$isLast) {
-                $label = ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part));
-            } else {
-                $label = $route->defaults['label'] ?? ucfirst(str_replace('_', ' ', $part)) ?? $routeName;
-            }
+            $name  = ucfirst(str_replace('_', ' ', $part));
+            $label = $isLast
+                ? ($route->defaults['label'] ?? $name)
+                : ucfirst(str_replace('_', ' ', $part));
     
-            $resource = Resource::updateOrCreate(
+            $resource = Resource::firstOrCreate(
                 ['code' => $code],
                 [
-                    'name'       => $isLast ? $name : ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part)),
+                    'name'       => $name,
                     'label'      => $label,
                     'route_name' => $isLast ? $routeName : $code . '.*',
                     'uri'        => $isLast ? $route->uri() : null,
                     'method'     => $isLast ? implode('|', $route->methods()) : 'ANY',
+                    'status'     => '1',
                     'level'      => $level + 1,
                     'parent_id'  => $parentId,
-                    'status'     => '1',
                 ]
             );
     
-            // Path_ids build
             $pathIds = $parentId
                 ? Resource::find($parentId)->path_ids . $resource->id . '/'
                 : '/' . $resource->id . '/';
     
             $resource->update([
                 'path_ids'  => $pathIds,
-                'parent_id' => $parentId,
                 'level'     => $level + 1,
+                'parent_id' => $parentId,
             ]);
     
             $parentId = $resource->id;
         }
     }
+    
 }

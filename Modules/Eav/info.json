@@ -1,0 +1,321 @@
+{
+    "module": "Eav",
+    "tables": {
+        "eav_entity_types": {
+            "name": "eav_entity_types",
+            "signature": "e2af19c24d86d495f6f0ce8287e0313e402120de",
+            "fields": [
+                {
+                    "name": "entity_type_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "code",
+                    "type": "string",
+                    "length": 100,
+                    "unique": true
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "length": 255
+                },
+                {
+                    "name": "model_class",
+                    "type": "string",
+                    "length": 255,
+                    "nullable": true
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "entity_type_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        },
+        "eav_entities": {
+            "name": "eav_entities",
+            "signature": "23a36606c7bd96bc0e3d46ab2d552f08be7f94f0",
+            "fields": [
+                {
+                    "name": "entity_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "entity_type_id",
+                    "type": "bigint",
+                    "foreign": "eav_entity_types.entity_type_id"
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "entity_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        },
+        "eav_attributes": {
+            "name": "eav_attributes",
+            "signature": "0f7ecb6cf5d1a8554959c0e984e663d06dd71074",
+            "fields": [
+                {
+                    "name": "attribute_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "entity_type_id",
+                    "type": "bigint",
+                    "foreign": "eav_entity_types.entity_type_id"
+                },
+                {
+                    "name": "code",
+                    "type": "string",
+                    "length": 255
+                },
+                {
+                    "name": "data_type",
+                    "type": "enum",
+                    "values": [
+                        "string",
+                        "text",
+                        "int",
+                        "decimal",
+                        "datetime",
+                        "boolean",
+                        "json"
+                    ]
+                },
+                {
+                    "name": "data_model",
+                    "type": "string",
+                    "length": 100,
+                    "nullable": true
+                },
+                {
+                    "name": "is_required",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "position",
+                    "type": "int",
+                    "default": 0
+                },
+                {
+                    "name": "default_value",
+                    "type": "text",
+                    "nullable": true
+                },
+                {
+                    "name": "is_translatable",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "attribute_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        },
+        "eav_attribute_translations": {
+            "name": "eav_attribute_translations",
+            "signature": "327e25b1a63b13ee2c1157a4186793f6cdd168be",
+            "fields": [
+                {
+                    "name": "translation_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "attribute_id",
+                    "type": "bigint",
+                    "foreign": "eav_attributes.attribute_id"
+                },
+                {
+                    "name": "lang_id",
+                    "type": "int",
+                    "foreign": "languages.lang_id"
+                },
+                {
+                    "name": "display_name",
+                    "type": "string",
+                    "length": 255
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "nullable": true
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "translation_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        },
+        "eav_attribute_values": {
+            "name": "eav_attribute_values",
+            "signature": "d4ef8bccfb742f8cd2f6f9dc8a70815ebc7a0a34",
+            "fields": [
+                {
+                    "name": "value_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "entity_id",
+                    "type": "bigint",
+                    "foreign": "eav_entities.entity_id"
+                },
+                {
+                    "name": "attribute_id",
+                    "type": "bigint",
+                    "foreign": "eav_attributes.attribute_id"
+                },
+                {
+                    "name": "lang_id",
+                    "type": "int",
+                    "foreign": "languages.lang_id",
+                    "nullable": true
+                },
+                {
+                    "name": "value",
+                    "type": "text",
+                    "nullable": true
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "value_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        },
+        "eav_attribute_options": {
+            "name": "eav_attribute_options",
+            "signature": "8f566967fdb2a11682c7aed5da7dae83dc66886f",
+            "fields": [
+                {
+                    "name": "option_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "attribute_id",
+                    "type": "bigint",
+                    "foreign": "eav_attributes.attribute_id"
+                },
+                {
+                    "name": "position",
+                    "type": "int",
+                    "default": 0
+                },
+                {
+                    "name": "is_active",
+                    "type": "boolean",
+                    "default": true
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "option_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        },
+        "eav_attribute_option_translations": {
+            "name": "eav_attribute_option_translations",
+            "signature": "13b953c6f0853753216dd4e3441b48eb59591da2",
+            "fields": [
+                {
+                    "name": "translation_id",
+                    "type": "bigint",
+                    "primary": true
+                },
+                {
+                    "name": "option_id",
+                    "type": "bigint",
+                    "foreign": "eav_attribute_options.option_id"
+                },
+                {
+                    "name": "lang_id",
+                    "type": "int",
+                    "foreign": "languages.lang_id"
+                },
+                {
+                    "name": "display_name",
+                    "type": "string",
+                    "length": 255
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "nullable": true
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "nullable": true
+                },
+                {
+                    "name": "updated_at",
+                    "type": "datetime",
+                    "nullable": true
+                }
+            ],
+            "primary_key": "translation_id",
+            "path_mode": "nested",
+            "ignore_module_prefix": true
+        }
+    },
+    "updated_at": "2025-10-13T04:17:42+00:00"
+}
