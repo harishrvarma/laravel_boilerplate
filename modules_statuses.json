@@ -8,5 +8,7 @@
     "Api": true,
     "Translation": true,
     "Cache": true,
-    "Menu": true
+    "Menu": true,
+    "Eav": true,
+    "Product": true
 }

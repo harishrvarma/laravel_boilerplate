@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Modules\Translation\Models\Translation;
 use Modules\Translation\Models\TranslationLocale;
 use Modules\Translation\View\Components\Translation\Listing\Edit;
+use Modules\Translation\View\Components\TranslationLocale\Edit as LocaleEdit;
  
 class TranslationController extends BackendController
 {
@@ -28,6 +29,17 @@ class TranslationController extends BackendController
         $layout  = $this->layout();
         $content = $layout->child('content');
         $content->child('edit', $edit);
+        return $layout->render();
+    }
+
+    public function addLocale()
+    {
+        $admin = $this->model(TranslationLocale::class);
+        $edit =  $this->block(LocaleEdit::class);
+        $edit->row($admin);
+        $layout  = $this->layout();
+        $content = $layout->child('content');
+        $content->child('editLocale', $edit);
         return $layout->render();
     }
 
@@ -88,6 +100,34 @@ class TranslationController extends BackendController
                 ->route('admin.translation.listing')
                 ->with('success', 'Record(s) saved');
     
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function saveLocale(Request $request)
+    {
+        try {
+            $params = $request->post('translationLocale');
+    
+            if ($TranslationLocaleId = $request->get('id')) {
+                $TranslationLocale = TranslationLocale::find($TranslationLocaleId);
+    
+                if (!$TranslationLocale || !$TranslationLocale->id) {
+                    throw new Exception("Invalid Request ID");
+                }
+    
+                $TranslationLocale->update($params);
+            } else {
+                $TranslationLocale = TranslationLocale::create($params);
+            }
+    
+            if ($TranslationLocale && $TranslationLocale->id) {
+                return redirect()->route('admin.translation.listing')
+                                 ->with('success', 'Record saved successfully');
+            } else {
+                throw new Exception('Something went wrong while saving the record');
+            }
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

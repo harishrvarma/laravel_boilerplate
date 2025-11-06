@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/eav",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Eav\\": "app/",
+            "Modules\\Eav\\Database\\Factories\\": "database/factories/",
+            "Modules\\Eav\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Eav\\Tests\\": "tests/"
+        }
+    }
+}

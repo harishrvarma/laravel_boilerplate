@@ -16,6 +16,7 @@ class Grid extends Block
     protected $totalCount = 0;
     protected $allowedPagination = true;
     protected $gridKey = null;
+    protected $primaryKey = null;
  
     protected $title = null;
     // Plural
@@ -472,12 +473,14 @@ class Grid extends Block
         return $this->massActions;
     }
 
-    public function getRendererBlock($column,$row) {
-        if(!$this->rendererObject){
-            $this->rendererObject = $this->block($column['columnClassName']);
-        }
-        return $this->rendererObject->row($row)->column($column);
+    public function getRendererBlock($column, $row)
+    {
+        $renderer = $this->block($column['columnClassName']);
+        $renderer->row($row);
+        $renderer->column($column);
+        return $renderer;
     }
+    
 
     public function getFilterBlock($column,$filter) {
         
@@ -548,6 +551,7 @@ class Grid extends Block
     {
         $module = $this->gridKey();
         $sessionKey = "hidden_columns_{$module}";
+        $this->primaryKey = $primaryKey; 
         
         if (request()->has('columns')) {
             $checkedColumns = request()->get('columns', []);
@@ -568,5 +572,13 @@ class Grid extends Block
             return $this;
         }
         return $this->gridKey;
+    }
+
+    public function primaryKey(string $primaryKey = null){
+        if(!is_null($primaryKey)){
+            $this->primaryKey = $primaryKey;
+            return $this;
+        }
+        return $this->primaryKey;
     }
 }

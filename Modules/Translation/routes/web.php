@@ -16,5 +16,8 @@ Route::prefix('admin')->group(function(){
         Route::get('/translation/delete/{id}', [TranslationController::class,'delete'])->name('admin.translation.delete')->defaults('label', 'Delete Translation');
         Route::post('/translation/massDelete', [TranslationController::class,'massDelete'])->name('admin.translation.massDelete')->defaults('label', 'Mass Delete Translation');
         Route::post('/translation/export', [TranslationController::class,'massExport'])->name('admin.translation.export')->defaults('label', 'Mass Export Translation');
+
+        Route::get('/translation/addLocale', [TranslationController::class,'addLocale'])->name('admin.translation.addLocale')->defaults('label', 'Add Translation Language');
+        Route::post('/translation/saveLocale', [TranslationController::class,'saveLocale'])->name('admin.translation.saveLocale')->defaults('label', 'Save Translation Language');
     });
 });

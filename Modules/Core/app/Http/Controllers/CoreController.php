@@ -13,7 +13,6 @@ class CoreController extends BackendController
 
         $module = $request->input('module', 'default');
         $sessionKey = "hidden_columns_{$module}";
-        dd($sessionKey);
 
         $hidden = session()->get($sessionKey, []);
 

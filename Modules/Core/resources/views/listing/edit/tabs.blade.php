@@ -28,7 +28,7 @@
                 role="tabpanel"
             >
                 @if($me->activeTabKey() == $tab['key'])
-                    {!! $me->block($tab['tabClassName'])->row($me->row())->render() !!}
+                    {!! $me->block($tab['tabClassName'], $tab['tabData'] ?? [])->row($me->row())->render() !!}
                 @endif
             </div>
         @endforeach

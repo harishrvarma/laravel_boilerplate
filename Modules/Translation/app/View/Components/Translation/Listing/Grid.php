@@ -180,6 +180,12 @@ class Grid extends CoreGrid
                 'label' => 'Add Translation',
             ]);
         }
+        if(canAccess('admin.translation.addLocale')){
+            $this->button('addLocale', [
+                'route' =>urlx('admin.translation.addLocale',[],true),
+                'label' => 'Add Language',
+            ]);
+        }
         return $this;
     }
 }

@@ -1,0 +1,44 @@
+{
+  "base_path": "__DIR__/",
+  "module": "Eav",
+  "tables": [
+
+    {
+      "name": "table_entity",
+      "primary_key": "entity_id",
+      "fields": [
+        { "name": "entity_id", "type": "bigint", "primary": true },
+        { "name": "entity_type_id", "type": "bigint"},
+        { "name": "created_at", "type": "datetime", "nullable": true },
+        { "name": "updated_at", "type": "datetime", "nullable": true }
+      ],
+      "path_mode": "nested",
+      "ignore_module_prefix": true
+    },
+    
+    {
+      "name": "table_entity_attribute_value",
+      "primary_key": "value_id",
+      "fields": [
+        { "name": "value_id", "type": "bigint", "primary": true },
+        { "name": "entity_id", "type": "bigint"},
+        { "name": "attribute_id", "type": "bigint"},
+        { "name": "lang_id", "type": "int", "nullable": true },
+        { "name": "value", "type": "text", "nullable": true },
+        { "name": "created_at", "type": "datetime", "nullable": true },
+        { "name": "updated_at", "type": "datetime", "nullable": true }
+      ],
+      "path_mode": "nested",
+      "ignore_module_prefix": true
+    }
+  ],
+  "generate": {
+    "controller": true,
+    "model": true,
+    "migration": true,
+    "seeder": true,
+    "routes": true,
+    "blocks": true,
+    "config": true
+  }
+}
