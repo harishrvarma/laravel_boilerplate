@@ -24,7 +24,7 @@ class CreateEavAttributesTable extends Migration
 
             $table->foreign('entity_type_id')
                   ->references('entity_type_id')
-                  ->on('table_eav_entity_types')
+                  ->on('table_eav_entity_type')
                   ->cascadeOnDelete();
                   
             $table->unique(['entity_type_id', 'code']);

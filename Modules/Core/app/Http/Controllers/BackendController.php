@@ -4,10 +4,17 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\Core\View\Components\Layout;
+use Illuminate\Support\Facades\App;
 
 class BackendController extends Controller
 {
     protected $layout = null;
+
+    public function __construct()
+    {
+        $locale = session('admin.locale', app()->getLocale());
+        App::setLocale($locale);
+    }
 
     protected function layout(){
         if(is_null($this->layout)){

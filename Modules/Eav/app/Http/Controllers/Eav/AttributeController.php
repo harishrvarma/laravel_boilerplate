@@ -163,17 +163,15 @@ class AttributeController extends BackendController
                     });
             }
 
-            $attributeConfig = AttributeConfig::updateOrCreate(
-                [
+            if (empty($data['attribute_id'])) {
+                AttributeConfig::create([
                     'entity_type_id' => $attribute->entity_type_id,
                     'attribute_id'   => $attribute->attribute_id,
-                ],
-                [
                     'show_in_grid'   => false,
                     'is_sortable'    => true,
                     'is_filterable'  => true,
-                ]
-            );
+                ]);
+            }
     
             return redirect()
                 ->route('admin.eav.attributes.listing')

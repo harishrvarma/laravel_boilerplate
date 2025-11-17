@@ -148,7 +148,6 @@ class Grid extends Block
     
         return new Pagination($this->paginator, [], $this->perPage(), $this);
     }
-    
 
     protected function applyFilters($query)
     {

@@ -1,14 +1,16 @@
 @php
     use Illuminate\Support\Carbon;
 
-    $valueKey = $field['id'] ?? $field['name'] ?? null;
-    $raw = $valueKey && isset($row) ? ($row->$valueKey ?? null) : null;
+    $raw = $field['value'] ?? null;
 
-    // Normalize to H:i for HTML5 time
     if ($raw instanceof \DateTimeInterface) {
         $dbValue = $raw->format('H:i');
     } elseif (is_string($raw) && !empty($raw)) {
-        try { $dbValue = Carbon::parse($raw)->format('H:i'); } catch (\Throwable $e) { $dbValue = $raw; }
+        try {
+            $dbValue = Carbon::parse($raw)->format('H:i');
+        } catch (\Throwable $e) {
+            $dbValue = $raw;
+        }
     } else {
         $dbValue = '';
     }
@@ -18,7 +20,7 @@
     $placeholder = $field['placeholder'] ?? '';
     $min = $field['min'] ?? '';
     $max = $field['max'] ?? '';
-    $step = $field['step'] ?? '60'; // default: 1-minute steps
+    $step = $field['step'] ?? '60';
     $required = !empty($field['required']);
     $inputId = $field['id'] ?? $field['name'];
 @endphp

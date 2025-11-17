@@ -71,6 +71,12 @@ class Grid extends CoreGrid
             'sortable' => true,
         ]);
 
+        $this->column('lang_type', [
+            'name' => 'lang_type',
+            'label' => 'Lang type',
+            'sortable' => true,
+        ]);
+
         $this->column('created_at', [
             'name' => 'created_at',
             'label' => 'Created at',

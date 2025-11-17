@@ -5,12 +5,13 @@
             <ul class="nav nav-pills card-header-pills" role="tablist">
                 @foreach($me->tabs() as $key => $tab)
                     <li class="nav-item" role="presentation">
-                        <a 
-                            class="nav-link {{ ($me->activeTabKey() == $tab['key']) ? 'active' : '' }}" 
-                            id="tab-{{ $tab['key'] }}-tab"
-                            href="{{ urlx(null,['tab' => $tab['key']]) }}"
-                            role="tab"
-                        >
+                    <a 
+                        class="nav-link {{ ($me->activeTabKey() == $tab['key']) ? 'active' : '' }}" 
+                        id="tab-{{ $tab['key'] }}-tab"
+                        data-bs-toggle="tab"
+                        href="#tab-{{ $tab['key'] }}"
+                        role="tab"
+                    >
                             {{ $tab['title'] }}
                         </a>
                     </li>
@@ -27,9 +28,7 @@
                 id="tab-{{ $tab['key'] }}" 
                 role="tabpanel"
             >
-                @if($me->activeTabKey() == $tab['key'])
-                    {!! $me->block($tab['tabClassName'], $tab['tabData'] ?? [])->row($me->row())->render() !!}
-                @endif
+                {!! $me->block($tab['tabClassName'], $tab['tabData'] ?? [])->row($me->row())->render() !!}
             </div>
         @endforeach
     </div>

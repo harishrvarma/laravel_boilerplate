@@ -40,16 +40,16 @@ class ApiServiceProvider extends ServiceProvider
             if (!Schema::hasTable('api_resource') || !Schema::hasColumn('api_resource', 'route_name')) {
                 return;
             }
+        
             $routes = collect(\Route::getRoutes())
-                ->filter(function ($route) {
-                    return str_starts_with($route->uri(), 'api/');
-                });
+                ->filter(fn($route) => str_starts_with($route->uri(), 'api/'));
+        
             $this->syncApiResources($routes);
-
-            $resources = ApiResource::pluck('name','code')
-            ->reject(fn($name, $code) => empty($code) || $code === 'api.')
-            ->toArray();
-    
+        
+            $resources = ApiResource::pluck('name', 'code')
+                ->reject(fn($name, $code) => empty($code) || $code === 'api')
+                ->toArray();
+        
             Passport::tokensCan($resources);
         });
     }
@@ -176,78 +176,76 @@ class ApiServiceProvider extends ServiceProvider
 
         return $paths;
     }
-
     public function syncApiResources($routes)
     {
-        $apiRoutes = collect($routes)->filter(function ($route) {
-            return str_starts_with($route->uri(), 'api/') && $route->getName();
-        });
+        $apiRoutes = collect($routes)
+            ->filter(fn($route) => str_starts_with($route->uri(), 'api/') && $route->getName());
     
         $newCodes = [];
+    
         foreach ($apiRoutes as $route) {
             $code = $route->getName();
     
-            if (!empty($code) && $code !== 'api.') {
+            if (!empty($code) && $code !== 'api') {
                 $newCodes[] = $code;
-                $this->createResourceTree($route);
+                $this->createApiResourceTree($route);
             }
         }
+    
         ApiResource::whereNotIn('code', $newCodes)->update(['status' => '0']);
     }
-
-    public function createResourceTree($route)
+    
+    public function createApiResourceTree($route)
     {
         $routeName = $route->getName();
-        $parts = explode('.', $routeName);
-    
-        if ($parts[0] !== 'api') {
+        if (empty($routeName) || !str_starts_with($routeName, 'api.')) {
             return;
         }
     
+        $parts = explode('.', $routeName);
         $parentId = null;
         $code = '';
-        $pathIds = '';
     
         foreach ($parts as $level => $part) {
-            $code = $code ? $code . '.' . $part : $part;
             $isLast = $level + 1 === count($parts);
     
-            // 👉 Name: only for last part
-            $name = $isLast ? ucfirst(str_replace('_', ' ', $part)) : null;
-    
-            // 👉 Label: if route ends with ".*", take the part before "*"
-            if (!$isLast) {
-                $label = ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part));
-            } else {
-                $label = $route->defaults['label'] ?? ucfirst(str_replace('_', ' ', $part)) ?? $routeName;
+            if ($level === 0 && $part === 'api') {
+                $code = 'api';
+                continue; // skip creating api node
             }
     
-            $resource = ApiResource::updateOrCreate(
+            // Admin style concatenation
+            $code = $code ? $code . '.' . $part : 'api.' . $part;
+    
+            $name  = ucfirst(str_replace('_', ' ', $part));
+            $label = $isLast ? ($route->defaults['label'] ?? $name) : $name;
+    
+            $resource = ApiResource::firstOrCreate(
                 ['code' => $code],
                 [
-                    'name'       => $isLast ? $name : ucfirst(str_replace('_', ' ', $parts[count($parts) - 2] ?? $part)),
+                    'name'       => $name,
                     'label'      => $label,
                     'route_name' => $isLast ? $routeName : $code . '.*',
                     'uri'        => $isLast ? $route->uri() : null,
                     'method'     => $isLast ? implode('|', $route->methods()) : 'ANY',
+                    'status'     => '1',
                     'level'      => $level + 1,
                     'parent_id'  => $parentId,
-                    'status'     => '1',
                 ]
             );
     
-            // Path_ids build
             $pathIds = $parentId
                 ? ApiResource::find($parentId)->path_ids . $resource->id . '/'
                 : '/' . $resource->id . '/';
     
             $resource->update([
                 'path_ids'  => $pathIds,
-                'parent_id' => $parentId,
                 'level'     => $level + 1,
+                'parent_id' => $parentId,
             ]);
     
             $parentId = $resource->id;
         }
     }
+    
 }

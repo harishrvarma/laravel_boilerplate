@@ -1,29 +1,32 @@
 @php
     use Illuminate\Support\Carbon;
 
-    $valueKey = $field['id'] ?? $field['name'] ?? null;
-    $raw = $valueKey && isset($row) ? ($row->$valueKey ?? null) : null;
+    $raw = $field['value'] ?? null;
 
-    // Normalize to Y-m-d for HTML date inputs (handles Carbon/string/null)
+    // Normalize to Y-m-d for HTML date inputs
     if ($raw instanceof \DateTimeInterface) {
         $dbValue = $raw->format('Y-m-d');
     } elseif (is_string($raw) && !empty($raw)) {
-        try { $dbValue = Carbon::parse($raw)->format('Y-m-d'); } catch (\Throwable $e) { $dbValue = $raw; }
+        try { 
+            $dbValue = Carbon::parse($raw)->format('Y-m-d'); 
+        } catch (\Throwable $e) { 
+            $dbValue = $raw; 
+        }
     } else {
         $dbValue = '';
     }
 
     $currentValue = old($field['name'], $dbValue);
 
-    // Options
     $placeholder = $field['placeholder'] ?? '';
     $min = $field['min'] ?? '';
     $max = $field['max'] ?? '';
     $required = !empty($field['required']);
-    $showToday = $field['todayBtn'] ?? true;   // show Today button by default
-    $showClear = $field['clearBtn'] ?? true;   // show Clear button by default
+    $showToday = $field['todayBtn'] ?? true;
+    $showClear = $field['clearBtn'] ?? true;
     $inputId = $field['id'] ?? $field['name'];
 @endphp
+
 
 <div class="mb-3">
     <label for="{{ $inputId }}" class="form-label">

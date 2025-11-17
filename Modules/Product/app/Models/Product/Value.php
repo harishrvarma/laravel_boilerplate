@@ -2,7 +2,7 @@
 
 namespace Modules\Product\Models\Product;
 
-use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Models\Eav\Model;
 use Modules\Eav\Models\Eav\Attribute;
 use Modules\Product\Models\Product\Entity;
 

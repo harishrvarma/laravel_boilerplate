@@ -44,6 +44,10 @@ return [
             'driver' => 'passport',
             'provider' => 'apiuser',
         ],
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
 
     /*
@@ -64,6 +68,10 @@ return [
     */
 
     'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ],
         'admin' => [
             'driver' => 'eloquent',
             'model' => Modules\Admin\Models\User::class,

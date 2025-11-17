@@ -1,6 +1,6 @@
 @php
     $valueKey = $field['id'] ?? '';
-    $currentFiles = $row->{$field['name']} ?? null;
+    $currentFiles = $field['value'] ?? null;
     $multiple = !empty($field['multiple']);
     $accept = !empty($field['accept']) ? 'accept="'.$field['accept'].'"' : '';
 @endphp
@@ -15,10 +15,10 @@
         <input 
             type="file"
             id="{{ $field['id'] }}"
-            name="{{ $field['name'] }}{{ !empty($field['multiple']) ? '[]' : '' }}"
+            name="{{ $field['name'] }}{{ $multiple ? '[]' : '' }}"
             class="form-control {{ $field['class'] ?? '' }} {{ $errors->has($field['name']) ? 'is-invalid' : '' }}"
-            {{ !empty($field['multiple']) ? 'multiple' : '' }}
-            {{ !empty($field['accept']) ? 'accept='.$field['accept'] : '' }}
+            {{ $multiple ? 'multiple' : '' }}
+            {!! $accept !!}
             onchange="previewFile{{ $field['id'] }}(event)"
         >
         <button type="button" class="btn btn-outline-secondary" onclick="clearFile{{ $field['id'] }}()">
@@ -27,13 +27,14 @@
     </div>
 
     <div class="mt-2" id="preview-container-{{ $field['id'] }}">
-        @if(!empty($row->{$field['name']}))
+        @if(!empty($currentFiles))
             @php
-                $files = is_array($row->{$field['name']}) ? $row->{$field['name']} : [$row->{$field['name']}];
+                $files = is_array($currentFiles) ? $currentFiles : [$currentFiles];
             @endphp
             @foreach($files as $file)
-                <p><i class="fas fa-file"></i> 
-                   <a href="{{ asset('storage/'.$file) }}" target="_blank">{{ basename($file) }}</a>
+                <p>
+                    <i class="fas fa-file"></i> 
+                    <a href="{{ asset('storage/'.$file) }}" target="_blank">{{ basename($file) }}</a>
                 </p>
             @endforeach
         @endif
@@ -43,7 +44,6 @@
         <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
 </div>
-
 
 @push('scripts')
 <script>

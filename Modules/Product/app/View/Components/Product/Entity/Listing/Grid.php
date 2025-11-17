@@ -7,6 +7,8 @@ use Modules\Product\Models\Product\Value;
 use Modules\Eav\Models\Eav\Attribute;
 use Modules\Core\View\Components\Eav\Listing\Grid as CoreGrid;
 use Modules\Eav\Models\Eav\Entity\Type;
+use Modules\Translation\Models\TranslationLocale;
+use Illuminate\Support\Facades\App;
 
 class Grid extends CoreGrid
 {
@@ -15,7 +17,7 @@ class Grid extends CoreGrid
     public function __construct()
     {
         parent::__construct();
-        $this->title('Manage Products');
+        $this->title(__('Product::messages.manage_products'));
     }
 
     public function prepareColumns()
@@ -30,7 +32,7 @@ class Grid extends CoreGrid
     
         $this->column('entity_id', [
             'name' => 'entity_id',
-            'label' => 'ID',
+            'label' => 'Id',
             'sortable' => true,
         ]);
     
@@ -38,18 +40,9 @@ class Grid extends CoreGrid
 
         foreach ($attributes as $attr) {
             if ($attr->config?->show_in_grid) {
-                $label = $attr->translations->first()?->display_name ?? $attr->code;
-                $this->column($attr->code, [
-                    'name' => $attr->code,
-                    'label' => $label,
-                    'sortable' => (bool) $attr->config?->is_sortable,
-                ]);
-            }
-        }
-    
-        foreach ($attributes as $attr) {
-            if ($attr->config?->show_in_grid) {
-                $label = $attr->translations->first()?->display_name ?? $attr->code;
+                $effectiveLangId = ((int) $attr->lang_type === 1) ? config_locale_id() : current_locale_id();
+                $translation = $attr->translations->firstWhere('lang_id', $effectiveLangId);
+                $label = $translation?->display_name ?? $attr->code;
                 $this->column($attr->code, [
                     'name' => $attr->code,
                     'label' => $label,
@@ -60,66 +53,46 @@ class Grid extends CoreGrid
     
         $this->column('created_at', ['name' => 'created_at', 'label' => 'Created At', 'sortable' => true]);
         $this->column('updated_at', ['name' => 'updated_at', 'label' => 'Updated At', 'sortable' => true]);
-    
+
         return $this;
     }
 
     public function prepareCollection()
     {
         $this->gridKey = 'Entity';
-        $admin = $this->model(Entity::class);
+        $entityModel = $this->model(Entity::class);
     
-        $query = $admin->newQuery()->from('product_entity as e');
+        $query = $entityModel->newQuery()->from('product_entity as e');
+    
         $baseColumns = ['entity_id', 'created_at', 'updated_at'];
-    
-        $entityTypeId = Type::where('code', 'product')->value('entity_type_id');
         $attributes = $this->getAttributes();
     
-        $allAttributeCodes = $attributes
-            ->filter(fn($attr) => $attr->config?->show_in_grid)
+        $allAttributeCodes = $attributes->filter(fn($attr) => $attr->config?->show_in_grid)
             ->pluck('code')
             ->toArray();
     
-        $defaultVisible = $attributes
-            ->filter(fn($attr) => $attr->config?->show_in_grid && $attr->config?->default_in_grid)
-            ->pluck('code')
-            ->toArray();
-    
-        $hiddenColumns = $this->handleHiddenColumns('entity_id',$attributes);
-    
+        $hiddenColumns = $this->handleHiddenColumns('entity_id', $attributes);
         $visibleColumns = array_diff(array_merge($baseColumns, $allAttributeCodes), $hiddenColumns);
     
-        $visibleAttributes = $attributes->filter(fn($attr) =>
-            $attr->config?->show_in_grid && in_array($attr->code, $visibleColumns)
-        );
-    
         $selects = [];
-    
         foreach ($baseColumns as $col) {
             if (in_array($col, $visibleColumns)) {
                 $selects[] = "e.$col as $col";
             }
         }
-    
-        foreach ($visibleAttributes as $attr) {
-            $alias = $attr->code;
-            $query->leftJoin("product_entity_attribute_value as {$alias}", function ($join) use ($alias, $attr) {
-                $join->on('e.entity_id', '=', "{$alias}.entity_id")
-                     ->where("{$alias}.attribute_id", '=', $attr->attribute_id);
-            });
-            $selects[] = "{$alias}.value as {$alias}";
-        }
-    
+
         $query->selectRaw(implode(', ', $selects));
     
+        $visibleAttributes = $attributes
+            ->filter(fn($attr) => $attr->config?->show_in_grid && in_array($attr->code, $visibleColumns))
+            ->all();
+
+        $query = $entityModel->joinAttr($query,$visibleAttributes, 'left');
+        
         if ($this->sortColumn() && $this->sortDir()) {
             $sortColumn = $this->sortColumn();
             if (in_array($sortColumn, $visibleColumns)) {
-                if (in_array($sortColumn, $baseColumns)) {
-                    $sortColumn = "e.$sortColumn";
-                } else {
-                    $sortColumn = "$sortColumn.value";
-                }
+                $sortColumn = in_array($sortColumn, $baseColumns) ? "e.$sortColumn" : "$sortColumn.value";
                 $query->orderBy($sortColumn, $this->sortDir());
             }
         }
@@ -127,12 +100,7 @@ class Grid extends CoreGrid
         $this->applyFilters($query);
         $this->pager($query);
     
-        $results = $query->get();
-        $results->transform(function ($row) {
-            $row->id = $row->entity_id;
-            return $row;
-        });
-    
+        $results = $query->get()->transform(fn($row) => tap($row, fn($r) => $r->id = $r->entity_id));
         $this->rows = $results;
     
         return $this;
@@ -210,6 +178,7 @@ class Grid extends CoreGrid
     public function prepareMassActions()
     {
         if (canAccess('admin.product.entity.massDelete')) {
+            parent::prepareMassActions();
             $this->massAction('delete', [
                 'value' => 'mass_delete',
                 'label' => 'Delete Selected',

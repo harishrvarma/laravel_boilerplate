@@ -1,6 +1,6 @@
 @php
-    $valueKey = $field['id'] ?? '';
-    $currentValue = $row->{$field['name']} ?? null;
+    $currentValue = $field['value'] ?? null;
+    $imagePath = $currentValue ? asset('storage/' . $currentValue) : null;
 @endphp
 
 <div class="mb-3">
@@ -24,10 +24,18 @@
     </div>
 
     <div class="mt-2" id="preview-container-{{ $field['id'] }}">
-        @if(!empty($row->{$field['name']}))
-            <img src="{{ asset('storage/'.$row->{$field['name']}) }}" 
-                 class="img-thumbnail" 
-                 style="max-height: 120px;">
+        @if($imagePath)
+            <img 
+                id="preview-{{ $field['id'] }}" 
+                src="{{ $imagePath }}" 
+                class="img-thumbnail" 
+                style="max-height: 120px;">
+        @else
+            <img 
+                id="preview-{{ $field['id'] }}" 
+                src="{{ asset('dist/img/placeholder.png') }}" 
+                class="img-thumbnail" 
+                style="max-height: 120px; display:none;">
         @endif
     </div>
 

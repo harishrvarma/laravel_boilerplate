@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Nwidart\Modules\Facades\Module;
 
 class TranslationServiceProvider extends ServiceProvider
 {
@@ -17,17 +18,42 @@ class TranslationServiceProvider extends ServiceProvider
     protected string $nameLower = 'translation';
 
     /**
+     * Register the service provider.
+     */
+    public function register(): void
+    {
+        $this->app->register(EventServiceProvider::class);
+        $this->app->register(RouteServiceProvider::class);
+
+        /**
+         * ✅ 1. Register all module translation namespaces EARLY
+         * So Laravel knows about them before any `__()` is called.
+         */
+        $this->app->booting(function () {
+            foreach (Module::all() as $module) {
+                $path = $module->getPath() . '/resources/lang';
+                if (is_dir($path)) {
+                    app('translation.loader')->addNamespace($module->getName(), $path);
+                }
+            }
+        });
+
+        /**
+         * ✅ 2. Extend Laravel’s translation loader to use DB + file fallback
+         */
+        $this->app->extend('translation.loader', function ($loader, $app) {
+            return new \Modules\Translation\Services\DatabaseLoader(
+                $app['files'],
+                $app['path.lang']
+            );
+        });
+    }
+
+    /**
      * Boot the application events.
      */
     public function boot(): void
     {
-        foreach (\Nwidart\Modules\Facades\Module::all() as $module) {
-            $path = $module->getPath() . '/resources/lang';
-            if (is_dir($path)) {
-                app('translation.loader')->addNamespace($module->getName(), $path);
-            }
-        }
-        
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();
@@ -35,15 +61,7 @@ class TranslationServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
     }
-
-    /**
-     * Register the service provider.
-     */
-    public function register(): void
-    {
-        $this->app->register(EventServiceProvider::class);
-        $this->app->register(RouteServiceProvider::class);
-    }
+    
 
     /**
      * Register commands in the format of Command::class

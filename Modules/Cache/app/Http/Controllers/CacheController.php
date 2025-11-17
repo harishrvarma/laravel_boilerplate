@@ -48,10 +48,13 @@ class CacheController extends BackendController
             CacheRegistry::all()->each(function ($entry) {
                 $entry->clear();
             });
-
-            return redirect()->route('admin.cache.listing')->with('success','All caches cleared successfully');
+    
+            \Cache::store('translations')->flush();
+    
+            return redirect()->route('admin.cache.listing')->with('success', 'All caches cleared successfully');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+    
 }

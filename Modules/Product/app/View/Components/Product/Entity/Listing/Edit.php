@@ -22,7 +22,7 @@ class Edit extends CoreEdit
                 'name' => 'Save',
                 'class' => 'btn btn-primary',
             ]);
-
+            
             $this->button('saveandcontinue', [
                 'id' => 'saveandcontinueBtn',
                 'name' => 'Save & Continue',
