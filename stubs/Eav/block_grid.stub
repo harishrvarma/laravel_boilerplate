@@ -1,0 +1,245 @@
+<?php
+
+namespace {{BlockNamespace}}\Listing;
+
+use {{ModelNamespace}};
+use Modules\Eav\Models\Eav\Attribute;
+use Modules\Eav\Models\Eav\Entity\Type;
+use Modules\Core\View\Components\Eav\Listing\Grid as CoreGrid;
+
+class Grid extends CoreGrid
+{
+    public $attributes = null;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->title('Manage {{Plural}}');
+    }
+
+    public function prepareColumns()
+    {
+        // Mass delete column
+        if (canAccess('admin.{{class_lower}}.massDelete')) {
+            $this->column('mass_ids', [
+                'name' => '{{PrimaryKey}}',
+                'label' => '',
+                'columnClassName' => '\Modules\Core\View\Components\Listing\Grid\Columns\MassIds',
+            ]);
+        }
+
+        // Base ID column
+        $this->column('{{PrimaryKey}}', [
+            'name' => '{{PrimaryKey}}',
+            'label' => 'ID',
+            'sortable' => true,
+        ]);
+
+        $attributes = $this->getAttributes();
+
+        foreach ($attributes as $attr) {
+            if ($attr->config?->show_in_grid) {
+
+                $effectiveLangId = ((int) $attr->lang_type === 1)
+                    ? config_locale_id()
+                    : current_locale_id();
+
+                $translation = $attr->translations->firstWhere('lang_id', $effectiveLangId);
+                $label = $translation?->display_name ?? $attr->code;
+
+                $this->column($attr->code, [
+                    'name' => $attr->code,
+                    'label' => $label,
+                    'sortable' => (bool) $attr->config?->is_sortable,
+                ]);
+            }
+        }
+
+        // Timestamps
+        $this->column('created_at', [
+            'name' => 'created_at',
+            'label' => 'Created At',
+            'sortable' => true,
+        ]);
+
+        $this->column('updated_at', [
+            'name' => 'updated_at',
+            'label' => 'Updated At',
+            'sortable' => true,
+        ]);
+
+        return $this;
+    }
+
+    public function prepareCollection()
+    {
+        $this->gridKey = '{{Model}}';
+
+        $model = $this->model({{Model}}::class);
+
+        $query = $model->newQuery()->from('{{table}} as e');
+
+        // Base columns
+        $baseColumns = ['{{PrimaryKey}}', 'created_at', 'updated_at'];
+
+        $attributes = $this->getAttributes();
+
+        $allAttrCodes = $attributes
+            ->filter(fn($a) => $a->config?->show_in_grid)
+            ->pluck('code')
+            ->toArray();
+
+        // Hidden columns system
+        $hiddenColumns = $this->handleHiddenColumns('{{PrimaryKey}}', $attributes);
+
+        $visibleColumns = array_diff(array_merge($baseColumns, $allAttrCodes), $hiddenColumns);
+
+        // Select base columns
+        $selects = [];
+        foreach ($baseColumns as $col) {
+            if (in_array($col, $visibleColumns)) {
+                $selects[] = "e.$col as $col";
+            }
+        }
+
+        if (!empty($selects)) {
+            $query->selectRaw(implode(',', $selects));
+        }
+
+        $visibleAttrs = $attributes->filter(
+            fn($attr) => $attr->config?->show_in_grid && in_array($attr->code, $visibleColumns)
+        );
+
+        $query = $model->joinAttr($query, $visibleAttrs->all(), 'left');
+
+        if ($this->sortColumn() && $this->sortDir()) {
+            $sortColumn = $this->sortColumn();
+
+            if (in_array($sortColumn, $visibleColumns)) {
+                $sortKey = in_array($sortColumn, $baseColumns)
+                    ? "e.$sortColumn"
+                    : "{$sortColumn}.value";
+
+                $query->orderBy($sortKey, $this->sortDir());
+            }
+        }
+
+        // Filters
+        $this->applyFilters($query);
+
+        // Pagination
+        $this->pager($query);
+
+        // Assign rows
+        $this->rows = $query->get()
+            ->transform(fn($row) => tap($row, fn($r) => $r->id = $r->{{PrimaryKey}}));
+
+        return $this;
+    }
+
+    public function prepareActions()
+    {
+        if (canAccess('admin.{{class_lower}}.edit')) {
+            $this->action('edit', [
+                'id' => 'editBtn',
+                'title' => 'Edit',
+                'url' => 'admin.{{class_lower}}.edit'
+            ]);
+        }
+
+        if (canAccess('admin.{{class_lower}}.delete')) {
+            $this->action('delete', [
+                'id' => 'deleteBtn',
+                'title' => 'Delete',
+                'url' => 'admin.{{class_lower}}.delete'
+            ]);
+        }
+
+        return $this;
+    }
+
+    public function prepareButtons()
+    {
+        if (canAccess('admin.{{class_lower}}.add')) {
+            $this->button('add', [
+                'route' => urlx('admin.{{class_lower}}.add', [], true),
+                'label' => 'Add {{Model}}',
+            ]);
+        }
+
+        return $this;
+    }
+
+    public function prepareFilters()
+    {
+        // Base filters
+        $this->filter('created_at', [
+            'name' => 'created_at',
+            'column' => 'e.created_at',
+            'type' => 'date',
+            'label' => 'Created At'
+        ]);
+
+        $this->filter('updated_at', [
+            'name' => 'updated_at',
+            'column' => 'e.updated_at',
+            'type' => 'date',
+            'label' => 'Updated At'
+        ]);
+
+        $attributes = $this->getAttributes();
+
+        foreach ($attributes as $attr) {
+            if ($attr->config?->show_in_grid && $attr->config?->is_filterable) {
+
+                $label = $attr->translations->first()?->display_name ?? $attr->code;
+
+                $this->filter($attr->code, [
+                    'name' => $attr->code,
+                    'column' => "{$attr->code}.value",
+                    'type'  => $attr->data_type,
+                    'label' => $label,
+                ]);
+            }
+        }
+
+        return $this;
+    }
+
+    public function prepareMassActions()
+    {
+        if (canAccess('admin.{{class_lower}}.massDelete')) {
+            parent::prepareMassActions();
+
+            $this->massAction('delete', [
+                'value' => 'mass_delete',
+                'label' => 'Delete Selected',
+                'url'   => 'admin.{{class_lower}}.massDelete',
+            ]);
+        }
+
+        if (canAccess('admin.{{class_lower}}.export')) {
+            $this->massAction('export', [
+                'value'  => 'mass_export',
+                'label'  => 'Export',
+                'url'    => 'admin.{{class_lower}}.export',
+            ]);
+        }
+
+        return $this;
+    }
+
+    protected function getAttributes()
+    {
+        if (!isset($this->attributes)) {
+            $entityTypeId = Type::where('code', '{{class_lower}}')->value('entity_type_id');
+
+            $this->attributes = Attribute::where('entity_type_id', $entityTypeId)
+                ->with(['translations', 'config'])
+                ->orderBy('position')
+                ->get();
+        }
+
+        return $this->attributes;
+    }
+}

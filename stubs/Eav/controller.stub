@@ -1,0 +1,287 @@
+<?php
+
+namespace {{Namespace}};
+
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Modules\Core\Http\Controllers\BackendController;
+use {{ModelNamespace}};
+use {{BlockNamespace}}\Listing;
+use {{BlockNamespace}}\Listing\Edit;
+use Modules\Eav\Models\Eav\Entity\Type;
+use Modules\Eav\Models\Eav\Attribute;
+
+class {{Class}}Controller extends BackendController
+{
+    /**
+     * Listing Page
+     */
+    public function listing(Request $request)
+    {
+        try {
+            $layout  = $this->layout();
+            $layout->title('Manage {{Plural}}');
+
+            $listing = $this->block(Listing::class);
+            $layout->child('content')->child('listing', $listing);
+
+            return $layout->render();
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    /**
+     * Add Page
+     */
+    public function add(Request $request)
+    {
+        try {
+            $layout = $this->layout();
+            $layout->title('Add {{Singular}}');
+
+            // Support entity_type_id= passed in URL
+            $entityTypeId = $request->get('entity_type_id');
+            $model = new {{Model}}(['entity_type_id' => $entityTypeId]);
+
+            $editBlock = $this->block(Edit::class)->row($model);
+            $layout->child('content')->child('edit', $editBlock);
+
+            return $layout->render();
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    /**
+     * Edit Page
+     */
+    public function edit($id)
+    {
+        try {
+            $layout = $this->layout();
+            $layout->title('Edit {{Singular}}');
+
+            if (!$id) {
+                throw new Exception("Invalid Request");
+            }
+
+            // Load model with attribute mapping
+            $model = {{Model}}::with(['values.attribute' => function ($q) {
+                $q->select('attribute_id', 'code');
+            }])->findOrFail($id);
+
+            // Load translations for all attributes
+            $attributeIds = $model->values->pluck('attribute_id')->toArray();
+
+            $translations = \Modules\Eav\Models\Eav\Attribute\Translation::whereIn('attribute_id', $attributeIds)
+                ->get()
+                ->keyBy('attribute_id');
+
+            foreach ($model->values as $v) {
+                $v->attribute->translation = $translations[$v->attribute_id] ?? null;
+            }
+
+            $editBlock = $this->block(Edit::class)->row($model);
+            $layout->child('content')->child('edit', $editBlock);
+
+            return $layout->render();
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    /**
+     * Save Entity + Attribute Values
+     */
+    public function save(Request $request)
+    {
+        try {
+            $params     = $request->post('{{class_lower}}', []);
+            $entityId   = $request->get('id');
+            $entityData = $request->post('{{class_lower}}_data', []);
+
+            // Ensure entity_type_id is set
+            if (empty($params['entity_type_id'])) {
+                $params['entity_type_id'] = Type::where('code', '{{class_lower}}')->value('entity_type_id');
+            }
+
+            // Create / update base entity
+            if ($entityId) {
+                $model = {{Model}}::findOrFail($entityId);
+                $model->update($params);
+            } else {
+                $model = {{Model}}::create($params);
+            }
+
+            // Load all attributes for this entity type
+            $Attributes = Attribute::where('entity_type_id', $params['entity_type_id'])
+                ->get()
+                ->keyBy('attribute_id');
+
+            $insertData = [];
+            $updateData = [];
+
+            foreach ($Attributes as $attributeId => $attribute) {
+                if (!isset($entityData[$attributeId])) {
+                    continue;
+                }
+
+                $langId       = key($entityData[$attributeId]);
+                $recordTypes  = current($entityData[$attributeId]);
+                $recordType   = key($recordTypes);
+                $value        = current($recordTypes);
+
+                $castedValue = $attribute->castValue($value);
+
+                if ($recordType === 'exist') {
+                    $updateData[] = [
+                        'attribute_id' => $attributeId,
+                        'lang_id'      => $langId,
+                        'value'        => $castedValue,
+                    ];
+                } else {
+                    $insertData[] = [
+                        'entity_id'    => $model->{{PrimaryKey}},
+                        'attribute_id' => $attributeId,
+                        'lang_id'      => $langId,
+                        'value'        => $castedValue,
+                    ];
+                }
+            }
+
+            // Insert new attribute values
+            if (!empty($insertData)) {
+                $model->values()->insert($insertData);
+            }
+
+            // Batch update existing values
+            if (!empty($updateData)) {
+                $table = $model->values()->getModel()->getTable();
+                $entityId = $model->{{PrimaryKey}};
+
+                $cases = [];
+                $whereConditions = [];
+
+                foreach ($updateData as $row) {
+                    $cases[] = "WHEN attribute_id = {$row['attribute_id']} AND lang_id = {$row['lang_id']} THEN '".addslashes($row['value'])."'";
+                    $whereConditions[] = "({$row['attribute_id']}, {$row['lang_id']})";
+                }
+
+                $caseSql = implode(' ', $cases);
+                $whereSql = implode(',', $whereConditions);
+
+                $sql = "UPDATE {$table}
+                        SET value = CASE {$caseSql} END
+                        WHERE entity_id = {$entityId}
+                        AND (attribute_id, lang_id) IN ({$whereSql})";
+
+                DB::statement($sql);
+            }
+
+            // Redirect
+            $redirectRoute = $request->get('continue')
+                ? route('admin.{{class_lower}}.edit', ['id' => $model->{{PrimaryKey}}])
+                : route('admin.{{class_lower}}.listing');
+
+            return redirect($redirectRoute)->with('success', 'Record saved successfully.');
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    /**
+     * Delete
+     */
+    public function delete(Request $request)
+    {
+        try {
+            if (!$request->id) {
+                throw new Exception("Invalid Request");
+            }
+
+            $row = {{Model}}::find($request->id);
+            if (!$row) {
+                throw new Exception("Invalid Request");
+            }
+
+            $row->delete();
+
+            return redirect()->route('admin.{{class_lower}}.listing')
+                ->with('success', 'Record deleted');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    /**
+     * Mass Delete
+     */
+    public function massDelete(Request $request)
+    {
+        try {
+            $ids = $request->post('mass_ids');
+            if (empty($ids)) {
+                throw new Exception('Invalid Ids');
+            }
+
+            {{Model}}::destroy($ids);
+
+            return redirect()->route('admin.{{class_lower}}.listing')
+                ->with('success', 'Records deleted');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    /**
+     * Mass Export
+     */
+    public function massExport(Request $request)
+    {
+        try {
+            $ids = $request->post('mass_ids', []);
+
+            $columns = $request->post('visible_columns', '');
+            $columns = $columns ? explode(',', $columns) : ['{{PrimaryKey}}'];
+
+            $columns = array_unique($columns);
+
+            $modelInstance = new {{Model}}();
+            $tableColumns = $modelInstance->getConnection()->getSchemaBuilder()->getColumnListing($modelInstance->getTable());
+
+            $columns = array_intersect($columns, $tableColumns);
+
+            $query = {{Model}}::query();
+
+            if (!empty($ids)) {
+                $query->whereIn('{{PrimaryKey}}', $ids);
+            }
+
+            $records = $query->get($columns);
+
+            $filename = '{{class_lower}}_export_' . date('Y-m-d_H-i-s') . '.csv';
+
+            return response()->stream(function () use ($records, $columns) {
+                $file = fopen('php://output', 'w');
+
+                fputcsv($file, $columns);
+
+                foreach ($records as $record) {
+                    fputcsv($file, $record->toArray());
+                }
+
+                fclose($file);
+            }, 200, [
+                'Content-Type'        => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"$filename\"",
+            ]);
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+}

@@ -16,53 +16,53 @@ Route::prefix('admin')
          *  ATTRIBUTE ROUTES
          * --------------------------*/
         Route::match(['GET', 'POST'], 'eav/attributes/listing', [AttributeController::class, 'listing'])
-            ->name('admin.eav.attributes.listing')->defaults('label', 'Attributes Listing');
+            ->name('admin.system.eav.attributes.listing')->defaults('label', 'Attributes Listing');
 
         Route::get('eav/attributes/add', [AttributeController::class, 'add'])
-            ->name('admin.eav.attributes.add')->defaults('label', 'Add Attribute');
+            ->name('admin.system.eav.attributes.add')->defaults('label', 'Add Attribute');
 
         Route::post('eav/attributes/save', [AttributeController::class, 'save'])
-            ->name('admin.eav.attributes.save')->defaults('label', 'Save Attribute');
+            ->name('admin.system.eav.attributes.save')->defaults('label', 'Save Attribute');
 
         Route::get('eav/attributes/edit/{id}', [AttributeController::class, 'edit'])
-            ->name('admin.eav.attributes.edit')->defaults('label', 'Edit Attribute');
+            ->name('admin.system.eav.attributes.edit')->defaults('label', 'Edit Attribute');
 
         Route::get('eav/attributes/delete/{id}', [AttributeController::class, 'delete'])
-            ->name('admin.eav.attributes.delete')->defaults('label', 'Delete Attribute');
+            ->name('admin.system.eav.attributes.delete')->defaults('label', 'Delete Attribute');
 
         Route::post('eav/attributes/mass-delete', [AttributeController::class, 'massDelete'])
-            ->name('admin.eav.attributes.massDelete')->defaults('label', 'Mass Delete Attributes');
+            ->name('admin.system.eav.attributes.massDelete')->defaults('label', 'Mass Delete Attributes');
 
         Route::post('eav/attributes/export', [AttributeController::class, 'massExport'])
-            ->name('admin.eav.attributes.export')->defaults('label', 'Mass Export Attributes');
+            ->name('admin.system.eav.attributes.export')->defaults('label', 'Mass Export Attributes');
 
         Route::get('eav/attributes/byentity/{entityTypeId}', [AttributeController::class, 'getGroupsByEntity'])
-            ->name('admin.eav.attributes.byEntity')->defaults('label', 'get Group Options By Entity');
+            ->name('admin.system.eav.attributes.byEntity')->defaults('label', 'get Group Options By Entity');
 
         /** -------------------------
          *  ATTRIBUTE GROUP ROUTES
          * --------------------------*/
 
          Route::match(['GET', 'POST'], 'eav/attributes/group/listing', [GroupController::class, 'listing'])
-            ->name('admin.eav.attributes.group.listing')->defaults('label', 'Attribute Group Listing');
+            ->name('admin.system.eav.attributes.group.listing')->defaults('label', 'Attribute Group Listing');
 
         Route::get('eav/attributes/group/add', [GroupController::class, 'add'])
-            ->name('admin.eav.attributes.group.add')->defaults('label', 'Add Attribute Group');
+            ->name('admin.system.eav.attributes.group.add')->defaults('label', 'Add Attribute Group');
 
         Route::post('eav/attributes/group/save', [GroupController::class, 'save'])
-            ->name('admin.eav.attributes.group.save')->defaults('label', 'Save Attribute Group');
+            ->name('admin.system.eav.attributes.group.save')->defaults('label', 'Save Attribute Group');
 
         Route::get('eav/attributes/group/edit/{id}', [GroupController::class, 'edit'])
-            ->name('admin.eav.attributes.group.edit')->defaults('label', 'Edit Attribute Group');
+            ->name('admin.system.eav.attributes.group.edit')->defaults('label', 'Edit Attribute Group');
 
         Route::get('eav/attributes/group/delete/{id}', [GroupController::class, 'delete'])
-            ->name('admin.eav.attributes.group.delete')->defaults('label', 'Delete Attribute Group');
+            ->name('admin.system.eav.attributes.group.delete')->defaults('label', 'Delete Attribute Group');
 
         Route::post('eav/attributes/group/mass-delete', [GroupController::class, 'massDelete'])
-            ->name('admin.eav.attributes.group.massDelete')->defaults('label', 'Mass Delete Attribute Groups');
+            ->name('admin.system.eav.attributes.group.massDelete')->defaults('label', 'Mass Delete Attribute Groups');
 
         Route::post('eav/attributes/group/export', [GroupController::class, 'massExport'])
-            ->name('admin.eav.attributes.group.export')->defaults('label', 'Mass Export Attribute Groups');
+            ->name('admin.system.eav.attributes.group.export')->defaults('label', 'Mass Export Attribute Groups');
 
         
         /** -------------------------
@@ -71,35 +71,35 @@ Route::prefix('admin')
 
 
         Route::match(['GET', 'POST'], 'eav/attributes/config/listing', [ConfigController::class, 'listing'])
-            ->name('admin.eav.attributes.config.listing')->defaults('label', 'Attribute config Listing');
+            ->name('admin.system.eav.attributes.config.listing')->defaults('label', 'Attribute config Listing');
 
         Route::post('eav/attributes/config/save', [ConfigController::class, 'save'])
-            ->name('admin.eav.attributes.config.save')->defaults('label', 'Save Attribute config');
+            ->name('admin.system.eav.attributes.config.save')->defaults('label', 'Save Attribute config');
 
         /** -------------------------
          *  ENTITY ROUTES
          * --------------------------*/
         Route::match(['GET', 'POST'], 'eav/entities/listing', [EntityController::class, 'listing'])
-            ->name('admin.eav.entities.listing')->defaults('label', 'Entities Listing');
+            ->name('admin.system.eav.entities.listing')->defaults('label', 'Entities Listing');
 
         Route::get('eav/entities/add', [EntityController::class, 'add'])
-            ->name('admin.eav.entities.add')->defaults('label', 'Add Entity');
+            ->name('admin.system.eav.entities.add')->defaults('label', 'Add Entity');
 
         Route::post('eav/entities/save', [EntityController::class, 'save'])
-            ->name('admin.eav.entities.save')->defaults('label', 'Save Entity');
+            ->name('admin.system.eav.entities.save')->defaults('label', 'Save Entity');
 
         Route::get('eav/entities/edit/{id}', [EntityController::class, 'edit'])
-            ->name('admin.eav.entities.edit')->defaults('label', 'Edit Entity');
+            ->name('admin.system.eav.entities.edit')->defaults('label', 'Edit Entity');
 
         Route::get('eav/entities/delete/{id}', [EntityController::class, 'delete'])
-            ->name('admin.eav.entities.delete')->defaults('label', 'Delete Entity');
+            ->name('admin.system.eav.entities.delete')->defaults('label', 'Delete Entity');
 
         Route::post('eav/entities/mass-delete', [EntityController::class, 'massDelete'])
-            ->name('admin.eav.entities.massDelete')->defaults('label', 'Mass Delete Entities');
+            ->name('admin.system.eav.entities.massDelete')->defaults('label', 'Mass Delete Entities');
 
         Route::post('eav/entities/export', [EntityController::class, 'massExport'])
-            ->name('admin.eav.entities.export')->defaults('label', 'Mass Export Entities');
+            ->name('admin.system.eav.entities.export')->defaults('label', 'Mass Export Entities');
 
         Route::get('eav/entities/structure/{id}', [EntityController::class, 'structure'])
-            ->name('admin.eav.entities.structure')->defaults('label', 'Prepare Module Structure');
+            ->name('admin.system.eav.entities.structure')->defaults('label', 'Prepare Module Structure');
     });

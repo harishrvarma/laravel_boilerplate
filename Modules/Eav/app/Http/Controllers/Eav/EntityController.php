@@ -181,43 +181,66 @@ class EntityController extends BackendController
             $entityType = Type::findOrFail($id);
             $code = strtolower($entityType->code);
     
-            $sourcePath = storage_path('Json/Eav.json');
-            $targetPath = storage_path("Json/" . ucfirst($code) . ".json");
+            // TEMPLATE FILES
+            $templates = [
+                'table_entity.json',
+                'table_entity_attribute_value.json'
+            ];
     
-            if (!File::exists($sourcePath)) {
-                return back()->with('error', 'Eav.json template not found at: ' . $sourcePath);
-            }
+            $createdFiles = [];
     
-            if (!File::exists($targetPath)) {
-                $json = File::get($sourcePath);
-                $data = json_decode($json, true);
+            foreach ($templates as $template) {
     
-                if (empty($data['tables'])) {
-                    return back()->with('error', 'Invalid Eav.json structure.');
+                $sourcePath = storage_path("Json/{$template}");
+    
+                if (!File::exists($sourcePath)) {
+                    return back()->with('error', "{$template} not found at: " . $sourcePath);
                 }
     
-                $data['module'] = ucfirst($code);
+                // Target filename
+                $targetName = str_replace('table_', "{$code}_", pathinfo($template, PATHINFO_FILENAME)) . ".json";
+                $targetPath = storage_path("Json/{$targetName}");
     
-                foreach ($data['tables'] as &$table) {
-                    if (!empty($table['name'])) {
-                        $table['name'] = str_replace('table_', "{$code}_", $table['name']);
+                // Create only if missing
+                if (!File::exists($targetPath)) {
+    
+                    $json = File::get($sourcePath);
+                    $data = json_decode($json, true);
+    
+                    if (empty($data['tables'])) {
+                        return back()->with('error', "Invalid structure in {$template}");
                     }
-                }
     
-                File::put($targetPath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                    // Update module name in JSON
+                    $data['module'] = ucfirst($code);
+    
+                    // Replace table_ prefix in all table names
+                    foreach ($data['tables'] as &$table) {
+                        if (!empty($table['name'])) {
+                            $table['name'] = str_replace('table_', "{$code}_", $table['name']);
+                        }
+                    }
+    
+                    File::put($targetPath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                    $createdFiles[] = $targetName;
+                }
             }
     
-            $command = "php8.4 artisan module:scaffold storage/Json/" . ucfirst($code) . ".json";
-    
+            // Prepare scaffold commands
+            $commands = [];
+            foreach ($createdFiles as $file) {
+                $commands[] = "php8.4 artisan eavmodule:scaffold storage/Json/{$file}";
+            }
             return redirect()->back()->with([
-                'success_message' => "Schema JSON file has been created successfully.",
+                'success_message' => "Schema JSON files created successfully.",
                 'module_code' => $code,
-                'command' => $command
+                'commands' => $commands
             ]);
     
         } catch (\Throwable $e) {
             return back()->with('error', $e->getMessage());
         }
     }
+    
     
 }

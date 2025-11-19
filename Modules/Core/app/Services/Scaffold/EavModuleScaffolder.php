@@ -3,7 +3,7 @@ namespace Modules\Core\Services\Scaffold;
 
 use Illuminate\Support\Str;
 
-class ModuleScaffolder
+class EavModuleScaffolder
 {
     public string $basePath;
     public string $module;
@@ -399,12 +399,14 @@ class ModuleScaffolder
             } else {
                 $existing = file_get_contents($targetFile);
         
+                // Add missing controller uses (after <?php)
                 foreach ($controllerUses as $use) {
                     if (strpos($existing, $use) === false) {
                         $existing = preg_replace('/(<\?php\s+)/', "$1\n$use\n", $existing, 1);
                     }
                 }
         
+                // Append only new routes
                 $newRoutes = '';
                 foreach ($routes as $route) {
                     if (strpos($existing, $route) === false) {
@@ -413,6 +415,7 @@ class ModuleScaffolder
                 }
         
                 if ($newRoutes) {
+                    // keep simple: append new route blocks at file end
                     $existing .= "\n" . $newRoutes;
                     file_put_contents($targetFile, $existing);
                     echo "♻️ Appended API routes to: {$targetFile}\n";
@@ -439,7 +442,7 @@ class ModuleScaffolder
     {
         return [
             'controller' => [
-                'stub' => 'controller.stub',
+                'stub' => 'Eav/controller.stub',
                 'target' => 'Modules/{{Module}}/app/Http/Controllers/{{TablePath}}Controller.php',
                 'type' => 'class',
                 'uses' => [
@@ -448,7 +451,7 @@ class ModuleScaffolder
                 ],
             ],
             'api_controller' => [
-                'stub' => 'api_controller.stub',
+                'stub' => 'Eav/api_controller.stub',
                 'target' => 'Modules/{{Module}}/app/Http/Controllers/api/v1/{{TablePath}}Controller.php',
                 'type' => 'class',
                 'uses' => [
@@ -457,7 +460,7 @@ class ModuleScaffolder
                 ],
             ],
             'model' => [
-                'stub' => 'model.stub',
+                'stub' => 'Eav/model.stub',
                 'target' => 'Modules/{{Module}}/app/Models/{{TablePath}}.php',
                 'type' => 'class',
                 'uses' => [
@@ -465,7 +468,7 @@ class ModuleScaffolder
                 ],
             ],
            'block_listing' => [
-                'stub' => 'block_listing.stub',
+                'stub' => 'Eav/block_listing.stub',
                 'target' => 'Modules/{{Module}}/app/View/Components/{{TablePath}}/Listing.php',
                 'type' => 'class',
                 'uses' => [
@@ -473,7 +476,7 @@ class ModuleScaffolder
                 ],
             ],
             'block_grid' => [
-                'stub' => 'block_grid.stub',
+                'stub' => 'Eav/block_grid.stub',
                 'target' => 'Modules/{{Module}}/app/View/Components/{{TablePath}}/Listing/Grid.php',
                 'type' => 'class',
                 'uses' => [
@@ -481,7 +484,7 @@ class ModuleScaffolder
                 ],
             ],
             'block_edit' => [
-                'stub' => 'block_edit.stub',
+                'stub' => 'Eav/block_edit.stub',
                 'target' => 'Modules/{{Module}}/app/View/Components/{{TablePath}}/Listing/Edit.php',
                 'type' => 'class',
                 'uses' => [
@@ -489,7 +492,7 @@ class ModuleScaffolder
                 ],
             ],
             'block_tabs' => [
-                'stub' => 'block_tabs.stub',
+                'stub' => 'Eav/block_tabs.stub',
                 'target' => 'Modules/{{Module}}/app/View/Components/{{TablePath}}/Listing/Edit/Tabs.php',
                 'type' => 'class',
                 'uses' => [
@@ -497,8 +500,8 @@ class ModuleScaffolder
                 ],
             ],
             'block_form' => [
-                'stub' => 'block_form.stub',
-                'target' => 'Modules/{{Module}}/app/View/Components/{{TablePath}}/Listing/Edit/Tabs/General.php',
+                'stub' => 'Eav/block_form.stub',
+                'target' => 'Modules/{{Module}}/app/View/Components/{{TablePath}}/Listing/Edit/Tabs/DynamicGroup.php',
                 'type' => 'class',
                 'uses' => [
                     '{{ModelNamespace}}',
@@ -841,8 +844,7 @@ class ModuleScaffolder
             $line = '';
         
             if (!empty($field['primary']) && in_array($type, ['integer', 'bigint'])) {
-                // auto-increment primary key, no need to track
-                $line = "\$table->id('{$field['name']}')";
+                $line = "\$table->bigIncrements('{$field['name']}')";
             } else {
                 $line = "\$table->{$type}('{$field['name']}')";
                 if (!empty($field['nullable'])) {
@@ -998,19 +1000,28 @@ class ModuleScaffolder
     public function renderColumn(string $tbl, array $field): string
     {
         $type = $this->mapType($field['type'] ?? 'string');
-        $line = "$tbl->" . $type . "('{$field['name']}')";
+    
+        if (!empty($field['primary']) && in_array($type, ['integer', 'bigint'])) {
+            return "$tbl->bigIncrements('{$field['name']}')";
+        }
+        $line = "$tbl->{$type}('{$field['name']}')";
+    
         if (!empty($field['nullable'])) {
             $line .= '->nullable()';
         }
+    
         if (array_key_exists('default', $field)) {
             $default = is_string($field['default']) ? "'{$field['default']}'" : $field['default'];
             $line .= "->default({$default})";
         }
+    
         if (!empty($field['primary'])) {
             $line .= '->primary()';
         }
+    
         return $line;
     }
+    
 }
 
 

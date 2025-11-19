@@ -1,0 +1,15 @@
+<?php
+
+namespace {{BlockNamespace}};
+
+use Modules\Core\View\Components\Eav\Listing as CoreListing;
+
+class Listing extends CoreListing
+{
+    /**
+     * Grid class reference for this listing.
+     *
+     * @var string
+     */
+    protected $gridClassName = "\Modules\{{Module}}\View\Components\{{FullClassPath}}\Listing\Grid"; 
+}

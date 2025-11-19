@@ -10,6 +10,7 @@ class Kernel extends ConsoleKernel
 
     protected $commands = [
         \App\Console\Commands\ScaffoldModule::class,
+        \App\Console\Commands\EavScaffoldModule::class,
     ];
 
     protected function schedule(Schedule $schedule)

@@ -10,51 +10,27 @@ class MenuCache
 {
     protected string $store = 'module';
 
-    // User-specific cache
-    public function getForUser($user)
-    {
-        $cacheKey = "module.user.{$user->id}";
-
-        return Cache::store($this->store)->rememberForever($cacheKey, function () use ($user, $cacheKey) {
-            $menu = Menu::buildMenuFromResources($user);
-
-            // Register in cache registry
-            CacheRegistry::updateOrCreate(
-                [
-                    'area'  => 'module',
-                    'type'  => 'menu',
-                    'key'   => $cacheKey,
-                    'store' => $this->store,
-                ],
-                ['last_generated' => now()]
-            );
-
-            return $menu;
-        });
-    }
-
-    // Global menu cache
     public function getGlobal()
     {
         $cacheKey = "module.menu.global";
-
-        return Cache::store($this->store)->rememberForever($cacheKey, function () use ($cacheKey) {
-            $menu = Menu::buildMenuFromResources(); // call without user
-
-            // Register in cache registry
-            CacheRegistry::updateOrCreate(
-                [
-                    'area'  => 'module',
-                    'type'  => 'menu',
-                    'key'   => $cacheKey,
-                    'store' => $this->store,
-                ],
-                ['last_generated' => now()]
-            );
-
-            return $menu;
-        });
+    
+        $menu = Menu::buildMenuFromResources();
+    
+        Cache::store($this->store)->forever($cacheKey, $menu);
+    
+        CacheRegistry::updateOrCreate(
+            [
+                'area'  => 'module',
+                'type'  => 'menu',
+                'key'   => $cacheKey,
+                'store' => $this->store,
+            ],
+            ['last_generated' => now()]
+        );
+    
+        return $menu;
     }
+    
 
     // Clear all menu caches (user + global)
     public function clearAll()

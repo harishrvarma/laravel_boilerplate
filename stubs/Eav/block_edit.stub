@@ -1,33 +1,35 @@
 <?php
 
-namespace Modules\Product\View\Components\Product\Entity\Listing;
+namespace {{BlockNamespace}}\Listing;
 
 use Modules\Core\View\Components\Eav\Listing\Edit as CoreEdit;
 
 class Edit extends CoreEdit
 {
-    protected $tabsClassName = '\Modules\Product\View\Components\Product\Entity\Listing\Edit\Tabs';
+    protected $tabsClassName = '\Modules\{{Module}}\View\Components\{{FullClassPath}}\Listing\Edit\Tabs';
 
     public function __construct()
     {
         parent::__construct();
-        $this->title('Add/Edit Entity');
+        $this->title('Add/Edit {{Singular}}');
     }
 
     public function prepareButtons()
     {
-        if (canAccess('admin.product.entity.save')) {
+        if (canAccess('admin.{{class_lower}}.save')) {
             $this->button('save', [
                 'id' => 'saveBtn',
                 'name' => 'Save',
                 'class' => 'btn btn-primary',
             ]);
-            
+        }
+
+        if (canAccess('admin.{{class_lower}}.save')) {
             $this->button('saveandcontinue', [
                 'id' => 'saveandcontinueBtn',
                 'name' => 'Save & Continue',
                 'class' => 'btn btn-primary',
-                'method' => "this.form.action = '" . urlx('admin.product.entity.save', ['continue' => 1]) . "'; this.form.submit();",
+                'method' => "this.form.action = '" . urlx('admin.{{class_lower}}.save', ['continue' => 1]) . "'; this.form.submit();",
             ]);
         }
 
@@ -35,7 +37,7 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name' => 'Back',
             'class' => 'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.product.entity.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.{{class_lower}}.listing') . "'",
         ]);
 
         return $this;
@@ -44,9 +46,8 @@ class Edit extends CoreEdit
     public function saveUrl()
     {
         if ($this->row()->getKey()) {
-            return urlx('admin.product.entity.save', ['id' => $this->row()->getKey()]);
+            return urlx('admin.{{class_lower}}.save', ['id' => $this->row()->getKey()]);
         }
-
-        return urlx('admin.product.entity.save');
+        return urlx('admin.{{class_lower}}.save');
     }
 }

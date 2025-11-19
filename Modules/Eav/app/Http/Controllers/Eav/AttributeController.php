@@ -163,15 +163,22 @@ class AttributeController extends BackendController
                     });
             }
 
-            if (empty($data['attribute_id'])) {
-                AttributeConfig::create([
-                    'entity_type_id' => $attribute->entity_type_id,
-                    'attribute_id'   => $attribute->attribute_id,
-                    'show_in_grid'   => false,
-                    'is_sortable'    => true,
-                    'is_filterable'  => true,
-                ]);
+            $config = AttributeConfig::where('entity_type_id', $attribute->entity_type_id)
+                ->where('attribute_id', $attribute->attribute_id)
+                ->first();
+
+            if (!$config) {
+                $config = new AttributeConfig();
+                $config->entity_type_id = $attribute->entity_type_id;
+                $config->attribute_id   = $attribute->attribute_id;
             }
+
+            $config->show_in_grid  = false;
+            $config->is_sortable   = true;
+            $config->is_filterable = true;
+
+            $config->save();
+
     
             return redirect()
                 ->route('admin.eav.attributes.listing')

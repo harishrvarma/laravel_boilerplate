@@ -32,41 +32,29 @@ class RoleController extends BackendController
         return $layout->render();
     }
 
-     public function save(Request $request){
-        try{
-            if($request->get('tab') == 'resource'){
-                $role = Role::findOrFail($request->id);
-
-                $resourceIds = $request->input('resources', []);
-
-                $role->resources()->sync($resourceIds);
-
-                return redirect()->to(urlx('admin.role.edit'))->with('success','Record saved');
+    public function save(Request $request)
+    {
+        try {
+            $roleData     = $request->input('role', []);
+            $resourceIds  = $request->input('resources', []);
+    
+            if ($id = $request->get('id')) {
+                $role = Role::findOrFail($id);
+                $role->update($roleData);
+            } else {
+                $role = Role::create($roleData);
             }
-            else{
-                $params = $request->post('role');
-
-                if($id = $request->get('id')){
-                    $role = Role::find($id);
-                    if(!$role->id){
-                        throw new Exception("Invalid Request ID");
-                    }
-                    $role->update($params);
-                }
-                else{
-                    $role = Role::create($params);
-                }
-                
-                if($role->id){
-                    return redirect()->route('admin.role.listing')->with('success','Record saved');
-                }
-                else{
-                    throw new Exception('Something went wrong');
-                }
-            }
-        }
-        catch(Exception $e){
-            return redirect()->back()->with('error',$e);
+    
+            $role->resources()->sync($resourceIds);
+    
+            return redirect()
+                ->route('admin.role.listing')
+                ->with('success', 'Record saved');
+        } 
+        catch (Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
         }
     }
 

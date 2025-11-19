@@ -20,7 +20,7 @@ class DynamicGroup extends CoreForm
     public function prepareFields()
     {
         if (!$this->group) return $this;
-    
+        
         foreach ($this->group->attributes as $attr) {
             $fieldLangId = $attr->lang_type ? config_locale_id() : current_locale_id();
     
