@@ -2,7 +2,7 @@
     use Illuminate\Support\Carbon;
 
     $valueKey = $field['id'] ?? $field['name'] ?? null;
-    $raw = $valueKey && isset($row) ? ($row->$valueKey ?? null) : null;
+    $raw = $field['value'] ?? null;
 
     // Normalize to Y-m-d\TH:i for HTML5 datetime-local
     if ($raw instanceof \DateTimeInterface) {

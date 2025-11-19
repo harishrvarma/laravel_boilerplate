@@ -2,8 +2,10 @@
 
 namespace Modules\Product\Models\Product;
 
-use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Models\Eav\Model;
 use Modules\Product\Models\Product\Value;
+use Modules\Translation\Models\TranslationLocale;
+use Modules\Settings\Models\ConfigKey;
 
 class Entity extends Model
 {

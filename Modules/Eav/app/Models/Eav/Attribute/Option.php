@@ -36,8 +36,7 @@ class Option extends Model
 
     public function translation()
     {
-        // Adjust according to how your translations table identifies language
-        $langId = defined('LANG_ID') ? LANG_ID : 1;
+        $langId = current_locale_id();
 
         return $this->hasOne(Translation::class, 'option_id', 'option_id')
                     ->where('lang_id', $langId);

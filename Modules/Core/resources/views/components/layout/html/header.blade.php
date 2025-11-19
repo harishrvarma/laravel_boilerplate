@@ -1,6 +1,8 @@
 @php
     use Modules\Translation\Models\TranslationLocale;
     $locales = TranslationLocale::orderBy('id')->get();
+    $currentLocale = session('admin.locale', app()->getLocale());
+    $currentLabel = $locales->where('code', $currentLocale)->first()->label ?? 'Language';
 @endphp
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <ul class="navbar-nav">
@@ -15,12 +17,12 @@
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button"
             data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-globe"></i> Language
+                <i class="fas fa-globe"></i> {{ $currentLabel }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
                 @foreach($locales as $locale)
                     <li>
-                        <a class="dropdown-item" href="{{ url()->current() }}?lang={{ $locale->code }}">
+                        <a class="dropdown-item" href="{{ urlx('admin.setlocale', ['locale' => $locale->code], true) }}">
                             {{ $locale->label }}
                         </a>
                     </li>

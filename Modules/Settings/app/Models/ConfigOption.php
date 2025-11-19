@@ -4,6 +4,7 @@ namespace Modules\Settings\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Settings\Models\ConfigKey;
+use Modules\Translation\Models\TranslationLocale;
 
 class ConfigOption extends Model
 {
@@ -22,4 +23,10 @@ class ConfigOption extends Model
     {
         return $this->belongsTo(ConfigKey::class, 'config_key_id');
     }
+
+    public function languageOptions()
+    {
+        return TranslationLocale::pluck('label', 'code')->toArray();
+    }
+    
 }

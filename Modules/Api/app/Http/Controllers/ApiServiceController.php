@@ -20,6 +20,9 @@ class ApiServiceController extends Controller
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
             $scopes = $apiUser->resources()->pluck('code')->toArray();
+            $scopes = array_filter($scopes, function ($scope) {
+                return !empty($scope) && $scope !== 'api.';
+            });
             $token = $apiUser->createToken('Client Access Token', $scopes)->accessToken;
             return response()->json(['token'=>$token]);
         }

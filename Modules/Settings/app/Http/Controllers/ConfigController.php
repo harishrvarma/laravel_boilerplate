@@ -101,7 +101,6 @@ class ConfigController extends BackendController
                 throw new \Exception("Config Group '{$tab}' not found");
             }
     
-            // Save or update ConfigKey
             if ($id = $request->get('id')) {
                 $configKey = ConfigKey::find($id);
                 if (!$configKey) {
@@ -114,7 +113,7 @@ class ConfigController extends BackendController
                     'input_type'      => $params['input_type'] ?? $configKey->input_type,
                     'is_required'     => isset($params['is_required']) ? 1 : 0,
                     'default_value'   => $params['default_value'] ?? $configKey->default_value,
-                    'options_source'  => $optionsSource ?: null, // ✅ new field
+                    'options_source'  => $optionsSource ?: null,
                 ]);
             } else {
                 $configKey = ConfigKey::create([
@@ -123,14 +122,13 @@ class ConfigController extends BackendController
                     'input_type'      => $params['input_type'] ?? 'text',
                     'is_required'     => isset($params['is_required']) ? 1 : 0,
                     'default_value'   => $params['default_value'] ?? null,
-                    'options_source'  => $optionsSource ?: null, // ✅ new field
+                    'options_source'  => $optionsSource ?: null,
                 ]);
             }
     
             if ($configKey && $configKey->id) {
                 $configKey->groups()->syncWithoutDetaching([$group->id]);
     
-                // ✅ Handle options only if no dynamic source provided
                 if (empty($optionsSource) && !empty($options) && in_array($params['input_type'], ['select','radio','checkbox'])) {
                     $position = 1;
                     $currentOptionValues = [];
@@ -162,10 +160,8 @@ class ConfigController extends BackendController
                         $position++;
                     }
     
-                    // Remove options that are no longer present
                     $configKey->options()->whereNotIn('option_value', $currentOptionValues)->delete();
                 } else {
-                    // ✅ If dynamic source is set, remove all old manual options
                     $configKey->options()->delete();
                 }
             }

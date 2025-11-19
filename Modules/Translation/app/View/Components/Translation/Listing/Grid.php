@@ -36,11 +36,12 @@ class Grid extends CoreGrid
             'sortable' => true,
         ]);
     
-        $this->column('locale', [
-            'name' => 'locale',
+        $this->column('locale_code', [
+            'name' => 'locale_code',
             'label' => 'Locale',
             'sortable' => true,
         ]);
+        
     
         $this->column('group', [
             'name' => 'group',

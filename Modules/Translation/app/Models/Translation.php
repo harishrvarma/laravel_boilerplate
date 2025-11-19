@@ -3,8 +3,7 @@
 namespace Modules\Translation\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
-use Modules\Translation\Models\TranslationLocale;
+use Modules\Translation\Services\DatabaseLoader;
 
 class Translation extends Model
 {
@@ -18,41 +17,49 @@ class Translation extends Model
         'value'
     ];
 
-    /**
-     * Relationship: Translation belongs to a locale
-     */
+
     public function locale()
     {
         return $this->belongsTo(TranslationLocale::class, 'locale_id');
     }
 
-    /**
-     * Accessor to still get `locale` as code (backward compatibility)
-     */
-    public function getLocaleAttribute()
+    public function getLocaleCodeAttribute()
     {
-        return $this->locale()->value('code');
+        return $this->locale?->code;
     }
 
-    /**
-     * Override save to clear cache automatically for this translation
-     */
     public function save(array $options = [])
     {
         $result = parent::save($options);
 
-        if ($this->module && $this->group && $this->locale) {
-            Cache::forget("translations.{$this->module}.{$this->group}.{$this->locale}");
+        if ($this->module && $this->group && $this->locale_code) {
+            DatabaseLoader::clearCache($this->module, $this->group, $this->locale_code);
         }
 
         return $result;
     }
 
-    /**
-     * Static method to clear cache for module/group/locale
-     */
-    public static function clearCache($module, $group, $locale)
+    public function delete()
     {
-        Cache::forget("translations.{$module}.{$group}.{$locale}");
+        $module = $this->module;
+        $group = $this->group;
+        $locale = $this->locale_code;
+
+        $result = parent::delete();
+
+        if ($module && $group && $locale) {
+            DatabaseLoader::clearCache($module, $group, $locale);
+        }
+
+        return $result;
+    }
+
+    public static function massDelete(array $ids)
+    {
+        $translations = self::whereIn('id', $ids)->get();
+
+        foreach ($translations as $translation) {
+            $translation->delete(); // triggers cache clear
+        }
     }
 }

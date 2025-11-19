@@ -11,6 +11,7 @@ use Modules\Product\View\Components\Product\Entity\Listing\Edit;
 use Modules\Eav\Models\Eav\Entity\Type;
 use Illuminate\Support\Facades\DB;
 use Modules\Product\Models\Product\Value;
+use Modules\Eav\Models\Eav\Attribute;
 
 class EntityController extends BackendController
 {
@@ -80,52 +81,94 @@ class EntityController extends BackendController
         }
     }
     
-
     public function save(Request $request)
     {
         try {
             $params = $request->post('entity', []);
-            $entityId = $request->get('id', []);
-            $attributes = $request->post('attributes', []);
+            $entityId = $request->get('id');
+            $entityData = $request->post('entity_data', []);
     
             if (empty($params['entity_type_id'])) {
                 $params['entity_type_id'] = Type::where('code', 'product')->value('entity_type_id');
             }
     
-            if (!empty($entityId)) {
-                $entity = Entity::findOrFail($entityId);
+            $entity = $entityId ? Entity::findOrFail($entityId) : Entity::create($params);
+            if ($entityId) {
                 $entity->update($params);
-            } else {
-                $entity = Entity::create($params);
             }
     
-            foreach ($attributes as $attributeId => $value) {
-                $entity->values()->updateOrCreate(
-                    [
+            $Attributes = Attribute::where('entity_type_id', $params['entity_type_id'])
+                ->get()
+                ->keyBy('attribute_id');
+    
+            $insertData = [];
+            $updateData = [];
+    
+            foreach ($Attributes as $attributeId => $attribute) {
+                if (!isset($entityData[$attributeId])) {
+                    continue;
+                }
+    
+                $langId = key($entityData[$attributeId]);
+                $recordTypes = current($entityData[$attributeId]);
+                $recordType = key($recordTypes);
+                $value = current($recordTypes);
+    
+                $castedValue = $attribute->castValue($value);
+    
+                if ($recordType === 'exist') {
+                    $updateData[] = [
                         'attribute_id' => $attributeId,
-                        'lang_id' => defined('LANG_ID') ? LANG_ID : 1,
-                    ],
-                    [
-                        'value' => $value,
-                    ]
-                );
+                        'lang_id'      => $langId,
+                        'value'        => $castedValue,
+                    ];
+                } else {
+                    $insertData[] = [
+                        'entity_id'    => $entity->entity_id,
+                        'attribute_id' => $attributeId,
+                        'lang_id'      => $langId,
+                        'value'        => $castedValue,
+                    ];
+                }
             }
     
-            if ($request->get('continue')) {
-                return redirect()
-                    ->route('admin.product.entity.edit', ['id' => $entity->entity_id])
-                    ->with('success', 'Record saved successfully.');
+            if (!empty($insertData)) {
+                $entity->values()->insert($insertData);
             }
+            
+            if (!empty($updateData)) {
+                $table = $entity->values()->getModel()->getTable();
+                $entityId = $entity->entity_id;
+
+                $cases = [];
+                $whereConditions = [];
+
+                foreach ($updateData as $row) {
+                    $cases[] = "WHEN attribute_id = {$row['attribute_id']} AND lang_id = {$row['lang_id']} THEN '".addslashes($row['value'])."'";
+                    $whereConditions[] = "({$row['attribute_id']}, {$row['lang_id']})";
+                }
+
+                $caseSql = implode(' ', $cases);
+                $whereSql = implode(',', $whereConditions);
+
+                $sql = "UPDATE {$table}
+                        SET value = CASE {$caseSql} END
+                        WHERE entity_id = {$entityId} 
+                        AND (attribute_id, lang_id) IN ({$whereSql})";
+
+                DB::statement($sql);
+            }
+
+            $redirectRoute = $request->get('continue')
+                ? route('admin.product.entity.edit', ['id' => $entity->entity_id])
+                : route('admin.product.entity.listing');
     
-            return redirect()
-                ->route('admin.product.entity.listing')
-                ->with('success', 'Record saved successfully.');
-    
+            return redirect($redirectRoute)->with('success', 'Record saved successfully.');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }
     }
-    
+
     public function delete(Request $request)
     {
         try {
@@ -169,11 +212,9 @@ class EntityController extends BackendController
         try {
             $ids = $request->post('mass_ids', []);
 
-            // Get visible columns
             $columns = $request->post('visible_columns', '');
             $columns = $columns ? explode(',', $columns) : ['id'];
 
-            // Remove duplicates
             $columns = array_unique($columns);
 
             $modelInstance = new Entity();

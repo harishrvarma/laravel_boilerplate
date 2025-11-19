@@ -188,8 +188,7 @@ class Menu extends Model
     public static function buildMenuFromResources($user = null)
     {
         if ($user) {
-            // User-specific menus
-            $resources = $user->allResources(); // returns Collection
+            $resources = $user->allResources();
             $resourceIds = $resources->pluck('id')->toArray();
     
             $menus = self::with('resource')
@@ -222,7 +221,6 @@ class Menu extends Model
     
         return self::buildTree($menus);
     }
-    
 
     /*
     |--------------------------------------------------------------------------

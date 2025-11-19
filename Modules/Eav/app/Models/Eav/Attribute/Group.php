@@ -32,8 +32,7 @@ class Group extends Model
 
     public function translation()
     {
-        // Use a fixed lang ID or a helper function for current language
-        $langId = defined('LANG_ID') ? LANG_ID : 1;
+        $langId = current_locale_id();
     
         return $this->hasOne(GroupTranslation::class, 'group_id', 'group_id')
                     ->where('lang_id', $langId);

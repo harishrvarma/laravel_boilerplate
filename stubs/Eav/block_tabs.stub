@@ -1,0 +1,62 @@
+<?php
+
+namespace {{BlockNamespace}}\Listing\Edit;
+
+use Modules\Core\View\Components\Eav\Listing\Edit\Tabs as CoreTabs;
+use Modules\Eav\Models\Eav\Attribute\Group;
+use Modules\Eav\Models\Eav\Entity\Type;
+use {{ModelNamespace}}\{{Model}};
+use Illuminate\Support\Facades\Request;
+
+class Tabs extends CoreTabs
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function prepareTabs()
+    {
+        $request = request();
+
+        $entityId = $request->route('id') ?? $request->get('id');
+
+        $entity = null;
+        if ($entityId) {
+            $entity = {{Model}}::with('values.attribute.translation')->find($entityId);
+        }
+
+        $entityTypeId = $entity?->entity_type_id
+            ?? $request->get('entity_type_id')
+            ?? Type::where('code', '{{class_lower}}')->value('entity_type_id');
+
+        if (!$entityTypeId) {
+            return $this;
+        }
+
+        $groups = Group::with([
+                'translation',
+                'attributes.translation',
+                'attributes.options.translation',
+            ])
+            ->where('entity_type_id', $entityTypeId)
+            ->orderBy('position', 'asc')
+            ->get();
+
+        foreach ($groups as $group) {
+            $tabKey = 'group_' . $group->group_id;
+
+            $this->tab($tabKey, [
+                'key'          => $tabKey,
+                'title'        => $group->translation->display_name ?? $group->code,
+                'tabClassName' => '\Modules\{{Module}}\View\Components\{{FullClassPath}}\Listing\Edit\Tabs\DynamicGroup',
+                'tabData'      => [
+                    'group'  => $group,
+                    'entity' => $entity,
+                ],
+            ]);
+        }
+
+        return $this;
+    }
+}

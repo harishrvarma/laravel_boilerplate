@@ -1,6 +1,9 @@
 @php
-    $valueKey = $field['id'] ?? $field['name'];
-    $currentValue = old($field['name'], $row->$valueKey ?? '');
+$valueKey = $field['id'] ?? $field['name'];
+
+$val = $row->$valueKey ?? $field['value'] ?? '';
+
+$currentValue = old($field['name'], is_numeric($val) ? $val : '');
 @endphp
 
 <div class="mb-3">
@@ -14,8 +17,8 @@
         name="{{ $field['name'] }}" 
         value="{{ $currentValue }}"
         step="{{ $field['step'] ?? 'any' }}"
-        min="{{ $field['min'] ?? '' }}"
-        max="{{ $field['max'] ?? '' }}"
+        @if(isset($field['min'])) min="{{ $field['min'] }}" @endif
+        @if(isset($field['max'])) max="{{ $field['max'] }}" @endif
         class="form-control {{ $field['class'] ?? '' }} {{ $errors->has($field['name']) ? 'is-invalid' : '' }}"
         placeholder="{{ $field['placeholder'] ?? '' }}"
         @if(!empty($field['required'])) required @endif
@@ -29,3 +32,4 @@
         <small class="form-text text-muted">{{ $field['help'] }}</small>
     @endif
 </div>
+

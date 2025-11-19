@@ -2,7 +2,7 @@
 
 namespace Modules\Product\View\Components\Product\Entity\Listing;
 
-use Modules\Core\View\Components\Listing\Edit as CoreEdit;
+use Modules\Core\View\Components\Eav\Listing\Edit as CoreEdit;
 
 class Edit extends CoreEdit
 {
@@ -22,7 +22,7 @@ class Edit extends CoreEdit
                 'name' => 'Save',
                 'class' => 'btn btn-primary',
             ]);
-
+            
             $this->button('saveandcontinue', [
                 'id' => 'saveandcontinueBtn',
                 'name' => 'Save & Continue',

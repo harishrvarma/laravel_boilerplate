@@ -4,19 +4,6 @@
   "tables": [
 
     {
-      "name": "table_entity",
-      "primary_key": "entity_id",
-      "fields": [
-        { "name": "entity_id", "type": "bigint", "primary": true },
-        { "name": "entity_type_id", "type": "bigint"},
-        { "name": "created_at", "type": "datetime", "nullable": true },
-        { "name": "updated_at", "type": "datetime", "nullable": true }
-      ],
-      "path_mode": "nested",
-      "ignore_module_prefix": true
-    },
-    
-    {
       "name": "table_entity_attribute_value",
       "primary_key": "value_id",
       "fields": [
@@ -33,12 +20,12 @@
     }
   ],
   "generate": {
-    "controller": true,
+    "controller": false,
     "model": true,
     "migration": true,
-    "seeder": true,
-    "routes": true,
-    "blocks": true,
-    "config": true
+    "seeder": false,
+    "routes": false,
+    "blocks": false,
+    "config": false
   }
 }

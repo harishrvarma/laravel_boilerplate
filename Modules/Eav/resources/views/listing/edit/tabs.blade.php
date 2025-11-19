@@ -113,6 +113,14 @@
                         <input type="text" name="attributes[position]" id="position" class="form-control" value="{{ $row->position ?? '' }}">
                     </div>
 
+                    <div class="form-group mt-2">
+                        <label for="lang_type">Lang Type</label>
+                        <select name="attributes[lang_type]" id="lang_type" class="form-control">
+                            <option value="0" {{ isset($row->lang_type) && $row->lang_type == 0 ? 'selected' : '' }}>Dynamic</option>
+                            <option value="1" {{ isset($row->lang_type) && $row->lang_type == 1 ? 'selected' : '' }}>Static</option>
+                        </select>
+                    </div>
+
                     <!-- <div class="form-group">
                         <label for="default_value">Default Value</label>
                         <input type="text" name="attributes[default_value]" id="default_value" class="form-control" value="{{ $row->default_value ?? '' }}">

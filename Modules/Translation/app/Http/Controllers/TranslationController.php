@@ -9,6 +9,8 @@ use Modules\Translation\Models\Translation;
 use Modules\Translation\Models\TranslationLocale;
 use Modules\Translation\View\Components\Translation\Listing\Edit;
 use Modules\Translation\View\Components\TranslationLocale\Edit as LocaleEdit;
+use Modules\Translation\Services\DatabaseLoader;
+
  
 class TranslationController extends BackendController
 {
@@ -49,62 +51,54 @@ class TranslationController extends BackendController
             $params = $request->post('translation');
     
             if (empty($params['module'])) {
-                throw new Exception("Please select at least one module");
+                throw new \Exception("Please select at least one module");
             }
     
             $modules = is_array($params['module']) ? $params['module'] : [$params['module']];
     
-            // ✅ Ensure locale_id exists
             $locale = TranslationLocale::find($params['locale_id']);
             if (!$locale) {
-                throw new Exception("Invalid locale selected");
+                throw new \Exception("Invalid locale selected");
             }
-    
             $localeId = $locale->id;
     
-            if ($id = $request->get('id')) {
-                $translation = Translation::find($id);
-                if (!$translation) {
-                    throw new Exception("Invalid Request ID");
-                }
+            $group = $params['group'];
+            $key   = $params['key'];
+            $value = $params['value'];
     
-                $group = $params['group'];
-                $key   = $params['key'];
+            if ($id = $request->get('id')) {
+                $translation = Translation::findOrFail($id);
     
                 foreach ($modules as $moduleName) {
-                    Translation::updateOrCreate(
-                        [
-                            'locale_id' => $localeId,   // ✅ use locale_id instead of locale
-                            'group'     => $group,
-                            'key'       => $key,
-                            'module'    => $moduleName,
-                        ],
-                        [
-                            'value'     => $params['value'],
-                        ]
-                    );
+                    $translation->locale_id = $localeId;
+                    $translation->group = $group;
+                    $translation->key = $key;
+                    $translation->value = $value;
+                    $translation->module = $moduleName;
+                    $translation->save();
                 }
             } else {
                 foreach ($modules as $moduleName) {
-                    Translation::create([
-                        'locale_id' => $localeId,   // ✅ use locale_id instead of locale
-                        'group'     => $params['group'],
-                        'key'       => $params['key'],
-                        'value'     => $params['value'],
+                    $translation = Translation::firstOrNew([
+                        'locale_id' => $localeId,
+                        'group'     => $group,
+                        'key'       => $key,
                         'module'    => $moduleName,
                     ]);
+                    $translation->value = $value;
+                    $translation->save();
                 }
             }
     
             return redirect()
                 ->route('admin.translation.listing')
-                ->with('success', 'Record(s) saved');
+                ->with('success', 'Record(s) saved successfully');
     
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
+    
     public function saveLocale(Request $request)
     {
         try {
@@ -154,33 +148,33 @@ class TranslationController extends BackendController
         }
     }
 
-    public function delete(Request $request){
-        try{
-
-            $translation = Translation::find($request->id);
-            if(!$translation->id){
-                throw new Exception("Invalid Request");
-            }
+    public function delete(Request $request)
+    {
+        try {
+            $translation = Translation::findOrFail($request->id);
             $translation->delete();
-            return redirect()->route('admin.translation.listing')->with('success','Record deleted');
+    
+            return redirect()->route('admin.translation.listing')
+                             ->with('success', 'Record deleted');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-        catch (Exception $e){
-            return redirect()->back()->with('error',$e);
-        }
-
     }
-
-    public function massDelete(Request $request){
-        try{
-            $ids = request('mass_ids');
-            if(is_null($ids)){
-                throw new Exception('Invalid Ids');
+    
+    public function massDelete(Request $request)
+    {
+        try {
+            $ids = $request->input('mass_ids', []);
+            if (empty($ids)) {
+                throw new \Exception('Invalid IDs');
             }
-            Translation::destroy($ids);
-            return redirect()->route('admin.admin.listing')->with('success','Records deleted');
-        }
-        catch (Exception $e){
-            return redirect()->back()->with('error',$e);
+    
+            Translation::massDelete($ids);
+    
+            return redirect()->route('admin.translation.listing')
+                             ->with('success', 'Records deleted');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
@@ -188,18 +182,14 @@ class TranslationController extends BackendController
     {
         $ids = $request->input('mass_ids', []);
     
-        // Get visible columns
         $columns = $request->input('visible_columns', '');
         $columns = $columns ? explode(',', $columns) : ['id'];
         $columns = array_unique($columns);
     
-        // Get table columns from DB
         $tableColumns = (new Translation)->getConnection()->getSchemaBuilder()->getColumnListing((new Translation)->getTable());
     
-        // Keep only columns that exist in DB
         $columns = array_intersect($columns, $tableColumns);
     
-        // Build query
         $query = Translation::query();
     
         if (!empty($ids)) {
@@ -217,10 +207,8 @@ class TranslationController extends BackendController
         $callback = function() use ($records, $columns) {
             $file = fopen('php://output', 'w');
     
-            // Header row
             fputcsv($file, $columns);
     
-            // Data rows
             foreach ($records as $record) {
                 $row = [];
                 foreach ($columns as $col) {

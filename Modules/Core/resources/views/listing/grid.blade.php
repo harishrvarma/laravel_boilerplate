@@ -22,7 +22,11 @@ $hiddenColumns = session("hidden_columns_{$module}", []);
         </div>
 
         <div class='mt-3'>
-            <pre class='mt-2 mb-0 d-inline-block' id="commandText">{{ session('command') }}</pre>
+            @if(session('commands'))
+                @foreach(session('commands') as $cmd)
+                    <pre class="mt-2 mb-0 d-inline-block command-line">{{ $cmd }}</pre><br>
+                @endforeach
+            @endif
             <button id='copyCommand' class='btn btn-sm btn-primary ms-2'>
                 <i class='fas fa-copy'></i>
             </button>
@@ -285,24 +289,32 @@ $hiddenColumns = session("hidden_columns_{$module}", []);
     });
 
     $(document).on('click', '#copyCommand', function () {
-        let command = $('#commandText').text().trim();
+
+        let commands = [];
+
+        $('.command-line').each(function () {
+            commands.push($(this).text().trim());
+        });
+
+        let finalText = commands.join("\n");
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(command)
-                .then(() => alert('✅ Command copied to clipboard!'))
+            navigator.clipboard.writeText(finalText)
+                .then(() => alert('✅ Commands copied to clipboard!'))
                 .catch(err => {
                     console.error(err);
                     alert('❌ Clipboard permission denied!');
                 });
         } else {
             let tempInput = document.createElement("textarea");
-            tempInput.value = command;
+            tempInput.value = finalText;
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand("copy");
             document.body.removeChild(tempInput);
-            alert('✅ Command copied to clipboard!');
+            alert('✅ Commands copied to clipboard!');
         }
     });
+
 </script>
 @endpush
