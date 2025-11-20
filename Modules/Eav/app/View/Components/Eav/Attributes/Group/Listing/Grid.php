@@ -18,7 +18,7 @@ class Grid extends CoreGrid
      */
     public function prepareColumns()
     {
-        if (canAccess('admin.eav.attributes.group.massDelete')) {
+        if (canAccess('admin.system.eav.attributes.group.massDelete')) {
             $this->column('mass_ids', [
                 'name' => 'group_id',
                 'label' => '',
@@ -71,19 +71,19 @@ class Grid extends CoreGrid
      */
     public function prepareActions()
     {
-        if (canAccess('admin.eav.attributes.group.edit')) {
+        if (canAccess('admin.system.eav.attributes.group.edit')) {
             $this->action('edit', [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.eav.attributes.group.edit',
+                'url' => 'admin.system.eav.attributes.group.edit',
             ]);
         }
 
-        if (canAccess('admin.eav.attributes.group.delete')) {
+        if (canAccess('admin.system.eav.attributes.group.delete')) {
             $this->action('delete', [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.eav.attributes.group.delete',
+                'url' => 'admin.system.eav.attributes.group.delete',
             ]);
         }
 
@@ -123,20 +123,20 @@ class Grid extends CoreGrid
      */
     public function prepareMassActions()
     {
-        if (canAccess('admin.eav.attributes.group.massDelete')) {
+        if (canAccess('admin.system.eav.attributes.group.massDelete')) {
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value' => 'mass_delete',
                 'label' => 'Delete Selected',
-                'url'   => 'admin.eav.attributes.group.massDelete',
+                'url'   => 'admin.system.eav.attributes.group.massDelete',
             ]);
         }
 
-        if (canAccess('admin.eav.attributes.group.export')) {
+        if (canAccess('admin.system.eav.attributes.group.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url'   => 'admin.eav.attributes.group.export',
+                'url'   => 'admin.system.eav.attributes.group.export',
             ]);
         }
     }
@@ -175,9 +175,9 @@ class Grid extends CoreGrid
      */
     public function prepareButtons()
     {
-        if (canAccess('admin.eav.attributes.group.add')) {
+        if (canAccess('admin.system.eav.attributes.group.add')) {
             $this->button('add', [
-                'route' => urlx('admin.eav.attributes.group.add', [], true),
+                'route' => urlx('admin.system.eav.attributes.group.add', [], true),
                 'label' => 'Add Attribute Group',
             ]);
         }

@@ -33,7 +33,7 @@ class CacheController extends BackendController
             $entry = CacheRegistry::findOrFail($id);
             $entry->clear();
 
-            return redirect()->route('admin.cache.listing')->with('success','Cache cleared successfully');
+            return redirect()->route('admin.system.cache.listing')->with('success','Cache cleared successfully');
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -51,7 +51,7 @@ class CacheController extends BackendController
     
             \Cache::store('translations')->flush();
     
-            return redirect()->route('admin.cache.listing')->with('success', 'All caches cleared successfully');
+            return redirect()->route('admin.system.cache.listing')->with('success', 'All caches cleared successfully');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

@@ -46,7 +46,7 @@ class ConfigController extends BackendController
                 }
             }
             return redirect()
-                ->route('admin.eav.attributes.config.listing', ['id' => $entityTypeId])
+                ->route('admin.system.eav.attributes.config.listing', ['id' => $entityTypeId])
                 ->with('success', 'Config saved successfully.');
     
         } catch (\Throwable $th) {

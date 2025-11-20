@@ -14,7 +14,7 @@ class Edit extends CoreEdit
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.cron.save')){
+        if(canAccess('admin.system.cron.save')){
             $this->button('save',[
                 'id' => 'saveBtn',
                 'name'=>'Save',
@@ -26,15 +26,15 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.cron.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.system.cron.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->getKey()){
-            return  urlx('admin.cron.save',['id'=>$this->row()->getKey()]);
+            return  urlx('admin.system.cron.save',['id'=>$this->row()->getKey()]);
         }
-        return  urlx('admin.cron.save');
+        return  urlx('admin.system.cron.save');
     }
 }

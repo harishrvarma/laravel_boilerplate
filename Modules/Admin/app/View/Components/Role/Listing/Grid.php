@@ -12,7 +12,7 @@ class Grid extends CoreGrid
     }
     public function prepareColumns()
     {
-        if(canAccess('admin.role.massDelete')){
+        if(canAccess('admin.system.role.massDelete')){
             $this->column('mass_ids', [
                 'name'=>'id',
                 'label'=>'',
@@ -47,38 +47,38 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.role.edit')){
+        if(canAccess('admin.system.role.edit')){
             $this->action('edit' , [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.role.edit'
+                'url' => 'admin.system.role.edit'
             ]);
         }
-        if(canAccess('admin.role.delete')){
+        if(canAccess('admin.system.role.delete')){
             $this->action('delete' , [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.role.delete'
+                'url' => 'admin.system.role.delete'
             ]);
         }
         return $this;
     }
 
     public function prepareMassActions(){
-        if(canAccess('admin.role.massDelete')){
+        if(canAccess('admin.system.role.massDelete')){
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value'=>'mass_delete',
                 'label' =>'Delete Selected',
-                'url' => 'admin.role.massDelete',
+                'url' => 'admin.system.role.massDelete',
             ]);
         }
 
-        if (canAccess('admin.role.export')) {
+        if (canAccess('admin.system.role.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url' => 'admin.role.export',
+                'url' => 'admin.system.role.export',
             ]);
         }
     }
@@ -104,10 +104,10 @@ class Grid extends CoreGrid
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.role.add')){
+        if(canAccess('admin.system.role.add')){
             $this->button('add', [
                 'label' => 'Add Role',
-                'route' =>urlx('admin.role.add',[],true),
+                'route' =>urlx('admin.system.role.add',[],true),
             ]);
         }
     }

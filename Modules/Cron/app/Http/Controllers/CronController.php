@@ -52,7 +52,7 @@ class CronController extends BackendController
             }
     
             if ($cron && $cron->cron_id) {
-                return redirect()->route('admin.cron.listing')
+                return redirect()->route('admin.system.cron.listing')
                                  ->with('success', 'Record saved successfully');
             } else {
                 throw new Exception('Something went wrong while saving the record');
@@ -97,7 +97,7 @@ class CronController extends BackendController
     
             $cron->delete(); // cron_schedules will be deleted automatically if FK is cascade
     
-            return redirect()->route('admin.cron.listing')->with('success', 'Record deleted');
+            return redirect()->route('admin.system.cron.listing')->with('success', 'Record deleted');
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -118,7 +118,7 @@ class CronController extends BackendController
                 $cron->delete();
             }
     
-            return redirect()->route('admin.cron.listing')->with('success', 'Records deleted');
+            return redirect()->route('admin.system.cron.listing')->with('success', 'Records deleted');
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

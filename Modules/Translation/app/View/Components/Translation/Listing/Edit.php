@@ -14,7 +14,7 @@ class Edit extends CoreEdit
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.translation.save')){
+        if(canAccess('admin.system.translation.save')){
             $this->button('save',[
                 'id' => 'saveBtn',
                 'name'=>'Save',
@@ -26,15 +26,15 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.translation.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.system.translation.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->id){
-            return urlx('admin.translation.save',['id'=>$this->row()->id]);
+            return urlx('admin.system.translation.save',['id'=>$this->row()->id]);
         }
-        return urlx('admin.translation.save');
+        return urlx('admin.system.translation.save');
     }
 }

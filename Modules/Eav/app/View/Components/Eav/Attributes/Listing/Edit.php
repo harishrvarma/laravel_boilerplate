@@ -17,7 +17,7 @@ class Edit extends CoreEdit
 
     public function prepareButtons()
     {
-        if (canAccess('admin.eav.attributes.save')) {
+        if (canAccess('admin.system.eav.attributes.save')) {
             $this->button('save', [
                 'id' => 'saveBtn',
                 'name' => 'Save',
@@ -25,12 +25,12 @@ class Edit extends CoreEdit
             ]);
         }
 
-        if (canAccess('admin.eav.attributes.save')) {
+        if (canAccess('admin.system.eav.attributes.save')) {
             $this->button('saveandcontinue', [
                 'id' => 'saveandcontinueBtn',
                 'name' => 'Save & Continue',
                 'class' => 'btn btn-primary',
-                'method' => "this.form.action = '" . urlx('admin.eav.attributes.save', ['continue' => 1]) . "'; this.form.submit();",
+                'method' => "this.form.action = '" . urlx('admin.system.eav.attributes.save', ['continue' => 1]) . "'; this.form.submit();",
             ]);
         }
 
@@ -38,7 +38,7 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name' => 'Back',
             'class' => 'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.eav.attributes.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.system.eav.attributes.listing') . "'",
         ]);
 
         return $this;
@@ -47,8 +47,8 @@ class Edit extends CoreEdit
     public function saveUrl()
     {
         if ($this->row()->getKey()) {
-            return urlx('admin.eav.attributes.save', ['id' => $this->row()->getKey()]);
+            return urlx('admin.system.eav.attributes.save', ['id' => $this->row()->getKey()]);
         }
-        return urlx('admin.eav.attributes.save');
+        return urlx('admin.system.eav.attributes.save');
     }
 }

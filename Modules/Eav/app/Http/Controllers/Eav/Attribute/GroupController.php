@@ -114,7 +114,7 @@ class GroupController extends BackendController
             }
     
             return redirect()
-                ->route('admin.eav.attributes.group.listing')
+                ->route('admin.system.eav.attributes.group.listing')
                 ->with('success', 'Attribute and options saved successfully.');
     
         } catch (\Throwable $th) {
@@ -134,7 +134,7 @@ class GroupController extends BackendController
             }
             $row->delete();
 
-            return redirect()->route('admin.eav.attributes.group.listing')
+            return redirect()->route('admin.system.eav.attributes.group.listing')
                              ->with('success', 'Attribute deleted');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -148,7 +148,7 @@ class GroupController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             Group::destroy($ids);
-            return redirect()->route('admin.eav.attributes.group.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.eav.attributes.group.listing')->with('success','Records deleted');
         }
         catch (\Throwable $th) {
             return redirect()->back()->with('error',$th);

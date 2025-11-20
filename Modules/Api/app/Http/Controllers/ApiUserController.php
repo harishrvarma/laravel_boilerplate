@@ -60,7 +60,7 @@ class ApiUserController extends BackendController
                 }
             }
             if($apiUser->id){
-                return redirect()->route('admin.apiuser.edit',['id'=>$apiUser->id])->with('success','Record saved');
+                return redirect()->route('admin.system.apiuser.edit',['id'=>$apiUser->id])->with('success','Record saved');
             }
             else{
                 throw new Exception('Something went wrong');
@@ -99,7 +99,7 @@ class ApiUserController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $apiUser->delete();
-            return redirect()->route('admin.apiuser.listing')->with('success','Record deleted');
+            return redirect()->route('admin.system.apiuser.listing')->with('success','Record deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);
@@ -113,7 +113,7 @@ class ApiUserController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             ApiUser::destroy($ids);
-            return redirect()->route('admin.apiuser.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.apiuser.listing')->with('success','Records deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);

@@ -16,7 +16,7 @@ class Grid extends CoreGrid
     public function prepareColumns()
     {
         // Mass selection checkbox
-        if (canAccess('admin.entities.massDelete')) {
+        if (canAccess('admin.system.eav.entities.massDelete')) {
             $this->column('mass_ids', [
                 'name' => 'entity_type_id',
                 'label' => '',
@@ -70,35 +70,35 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if (canAccess('admin.eav.entities.edit')) {
+        if (canAccess('admin.system.eav.entities.edit')) {
             $this->action('edit', [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.eav.entities.edit'
+                'url' => 'admin.system.eav.entities.edit'
             ]);
         }
 
-        if (canAccess('admin.eav.entities.delete')) {
+        if (canAccess('admin.system.eav.entities.delete')) {
             $this->action('delete', [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.eav.entities.delete'
+                'url' => 'admin.system.eav.entities.delete'
             ]);
         }
 
-        if (canAccess('admin.eav.entities.structure')) {
+        if (canAccess('admin.system.eav.entities.structure')) {
             $this->action('structure', [
                 'id' => 'structureBtn',
                 'title' => 'Prepare Module Structure',
-                'url' => 'admin.eav.entities.structure'
+                'url' => 'admin.system.eav.entities.structure'
             ]);
         }
 
-        if (canAccess('admin.eav.attributes.config.listing')) {
+        if (canAccess('admin.system.eav.attributes.config.listing')) {
             $this->action('config', [
                 'id' => 'configBtn',
                 'title' => 'Config',
-                'url' => 'admin.eav.attributes.config.listing',
+                'url' => 'admin.system.eav.attributes.config.listing',
             ]);
         }
         
@@ -132,7 +132,7 @@ class Grid extends CoreGrid
 
     public function prepareMassActions()
     {
-        if (canAccess('admin.eav.entities.massDelete')) {
+        if (canAccess('admin.system.eav.entities.massDelete')) {
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value' => 'mass_delete',
@@ -141,7 +141,7 @@ class Grid extends CoreGrid
             ]);
         }
 
-        if (canAccess('admin.eav.entities.export')) {
+        if (canAccess('admin.system.eav.entities.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
@@ -176,9 +176,9 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        if (canAccess('admin.eav.entities.add')) {
+        if (canAccess('admin.system.eav.entities.add')) {
             $this->button('add', [
-                'route' => urlx('admin.eav.entities.add', [], true),
+                'route' => urlx('admin.system.eav.entities.add', [], true),
                 'label' => 'Add Entity Type',
             ]);
         }

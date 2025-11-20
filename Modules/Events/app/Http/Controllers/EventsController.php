@@ -46,7 +46,7 @@ class EventsController extends BackendController
                 $event = Event::create($params);
             }
             if($event->id){
-                return redirect()->route('admin.event.listing')->with('success','Record saved');
+                return redirect()->route('admin.system.event.listing')->with('success','Record saved');
             }
             else{
                 throw new Exception('Something went wrong');
@@ -85,7 +85,7 @@ class EventsController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $event->delete();
-            return redirect()->route('admin.event.listing')->with('success','Record deleted');
+            return redirect()->route('admin.system.event.listing')->with('success','Record deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);
@@ -100,7 +100,7 @@ class EventsController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             Event::destroy($ids);
-            return redirect()->route('admin.event.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.event.listing')->with('success','Records deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);

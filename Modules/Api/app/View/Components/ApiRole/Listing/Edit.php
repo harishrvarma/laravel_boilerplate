@@ -14,7 +14,7 @@ class Edit extends CoreEdit
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.apirole.save')){
+        if(canAccess('admin.system.apirole.save')){
             $this->button('save',[
                 'id' => 'saveBtn',
                 'name'=>'Save',
@@ -26,15 +26,15 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.apirole.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.system.apirole.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->id){
-            return  urlx('admin.apirole.save',['id'=>$this->row()->id]);
+            return  urlx('admin.system.apirole.save',['id'=>$this->row()->id]);
         }
-        return  urlx('admin.apirole.save');
+        return  urlx('admin.system.apirole.save');
     }
 }

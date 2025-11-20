@@ -48,7 +48,7 @@ class RoleController extends BackendController
             $role->resources()->sync($resourceIds);
     
             return redirect()
-                ->route('admin.role.listing')
+                ->route('admin.system.role.listing')
                 ->with('success', 'Record saved');
         } 
         catch (Exception $e) {
@@ -86,7 +86,7 @@ class RoleController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $role->delete();
-            return redirect()->route('admin.role.listing')->with('success','Record deleted');
+            return redirect()->route('admin.system.role.listing')->with('success','Record deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);
@@ -101,7 +101,7 @@ class RoleController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             Role::destroy($ids);
-            return redirect()->route('admin.role.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.role.listing')->with('success','Records deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);

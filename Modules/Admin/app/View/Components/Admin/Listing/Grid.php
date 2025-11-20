@@ -14,7 +14,7 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        if(canAccess('admin.admin.massDelete')){
+        if(canAccess('admin.system.admin.massDelete')){
             $this->column('mass_ids', [
                 'name'=>'id',
                 'label'=>'',
@@ -60,18 +60,18 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.admin.edit')){
+        if(canAccess('admin.system.admin.edit')){
             $this->action('edit' , [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.admin.edit'
+                'url' => 'admin.system.admin.edit'
             ]);
         }
-        if(canAccess('admin.admin.delete')){
+        if(canAccess('admin.system.admin.delete')){
             $this->action('delete' , [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.admin.delete'
+                'url' => 'admin.system.admin.delete'
             ]);
         }
         return $this;
@@ -108,20 +108,20 @@ class Grid extends CoreGrid
     }
 
     public function prepareMassActions(){
-        if(canAccess('admin.admin.massDelete')){
+        if(canAccess('admin.system.admin.massDelete')){
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value'=>'mass_delete',
                 'label' =>'Delete Selected',
-                'url' => 'admin.admin.massDelete',
+                'url' => 'admin.system.admin.massDelete',
             ]);
         }
 
-        if (canAccess('admin.admin.export')) {
+        if (canAccess('admin.system.admin.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url' => 'admin.admin.export',
+                'url' => 'admin.system.admin.export',
             ]);
         }
     }
@@ -147,9 +147,9 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        if(canAccess('admin.admin.add')){
+        if(canAccess('admin.system.admin.add')){
             $this->button('add', [
-                'route' =>urlx('admin.admin.add',[],true),
+                'route' =>urlx('admin.system.admin.add',[],true),
                 'label' => 'Add Admin',
             ]);
         }
