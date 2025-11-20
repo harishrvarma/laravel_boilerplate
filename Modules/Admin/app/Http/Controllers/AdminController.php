@@ -92,9 +92,9 @@ class AdminController extends BackendController
                 }
             }
             if($request->get('continue')){
-                return redirect()->route('admin.admin.edit', ['id' => $row->getKey()])->with('success', 'Record saved');
+                return redirect()->route('admin.system.admin.edit', ['id' => $row->getKey()])->with('success', 'Record saved');
             }
-            return redirect()->route('admin.admin.listing')->with('success', 'Record saved');
+            return redirect()->route('admin.system.admin.listing')->with('success', 'Record saved');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error',$th);
         }
@@ -111,7 +111,7 @@ class AdminController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $row->delete();
-            return redirect()->route('admin.admin.listing')->with('success','Record deleted');
+            return redirect()->route('admin.system.admin.listing')->with('success','Record deleted');
         }
         catch (\Throwable $th) {
             return redirect()->back()->with('error',$th);
@@ -125,7 +125,7 @@ class AdminController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             User::destroy($ids);
-            return redirect()->route('admin.admin.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.admin.listing')->with('success','Records deleted');
         }
         catch (\Throwable $th) {
             return redirect()->back()->with('error',$th);

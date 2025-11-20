@@ -14,7 +14,7 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        if(canAccess('admin.cron.massDelete')){
+        if(canAccess('admin.system.cron.massDelete')){
             $this->column('mass_ids', [
                 'name'=>'cron_id',
                 'label'=>'',
@@ -72,25 +72,25 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.cron.edit')){
+        if(canAccess('admin.system.cron.edit')){
             $this->action('edit' , [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.cron.edit'
+                'url' => 'admin.system.cron.edit'
             ]);
         }
-        if(canAccess('admin.cron.delete')){
+        if(canAccess('admin.system.cron.delete')){
             $this->action('delete' , [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.cron.delete'
+                'url' => 'admin.system.cron.delete'
             ]);
         }
-        if (canAccess('admin.cron.run')) {
+        if (canAccess('admin.system.cron.run')) {
             $this->action('run', [
                 'id' => 'runBtn',
                 'title' => 'Run Now',
-                'url' => 'admin.cron.run',
+                'url' => 'admin.system.cron.run',
                 'class' => 'btn btn-success',
             ]);
         }
@@ -118,29 +118,29 @@ class Grid extends CoreGrid
 
     public function prepareMassActions()
     {
-        if(canAccess('admin.cron.massDelete')){
+        if(canAccess('admin.system.cron.massDelete')){
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value'=>'mass_delete',
                 'label' =>'Delete Selected',
-                'url' => 'admin.cron.massDelete',
+                'url' => 'admin.system.cron.massDelete',
             ]);
         }
 
-        if (canAccess('admin.cron.export')) {
+        if (canAccess('admin.system.cron.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url' => 'admin.cron.export',
+                'url' => 'admin.system.cron.export',
             ]);
         }
     }
 
     public function prepareButtons()
     {
-        if(canAccess('admin.cron.add')){
+        if(canAccess('admin.system.cron.add')){
             $this->button('add', [
-                'route' =>urlx('admin.cron.add',[],true),
+                'route' =>urlx('admin.system.cron.add',[],true),
                 'label' => 'Add Cron',
             ]);
         }

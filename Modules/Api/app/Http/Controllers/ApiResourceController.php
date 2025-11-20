@@ -46,7 +46,7 @@ class ApiResourceController extends BackendController
                 $apiResource = ApiResource::create($params);
             }
             if($apiResource->id){
-                return redirect()->route('admin.apiresource.edit',['id'=>$apiResource->id])->with('success','Record saved');
+                return redirect()->route('admin.system.apiresource.edit',['id'=>$apiResource->id])->with('success','Record saved');
             }
             else{
                 throw new Exception('Something went wrong');
@@ -85,7 +85,7 @@ class ApiResourceController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $apiResource->delete();
-            return redirect()->route('admin.apiresource.listing')->with('success','Record deleted');
+            return redirect()->route('admin.system.apiresource.listing')->with('success','Record deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);
@@ -100,7 +100,7 @@ class ApiResourceController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             ApiResource::destroy($ids);
-            return redirect()->route('admin.apiresource.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.apiresource.listing')->with('success','Records deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);

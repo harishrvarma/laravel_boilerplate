@@ -39,7 +39,7 @@ class ListenerController extends BackendController
                 $listener = Listener::create($params);
             }
             if($listener->id){
-                return redirect()->to(urlx('admin.event.edit',['id'=>$listener->event_id]));
+                return redirect()->to(urlx('admin.system.event.edit',['id'=>$listener->event_id]));
             }
             else{
                 throw new Exception('Something went wrong');
@@ -78,7 +78,7 @@ class ListenerController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $listener->delete();
-            return redirect()->to(urlx('admin.event.edit',['id'=>$listener->event_id]));
+            return redirect()->to(urlx('admin.system.event.edit',['id'=>$listener->event_id]));
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);

@@ -13,7 +13,7 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        if(canAccess('admin.apirole.massDelete')){
+        if(canAccess('admin.system.apirole.massDelete')){
             $this->column('mass_ids', [
                 'name'=>'id',
                 'label'=>'',
@@ -42,38 +42,38 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.apirole.edit')){
+        if(canAccess('admin.system.apirole.edit')){
             $this->action('edit' , [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.apirole.edit'
+                'url' => 'admin.system.apirole.edit'
             ]);
         }
-        if(canAccess('admin.apirole.delete')){
+        if(canAccess('admin.system.apirole.delete')){
             $this->action('delete' , [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.apirole.delete'
+                'url' => 'admin.system.apirole.delete'
             ]);
         }
         return $this;
     }
 
     public function prepareMassActions(){
-        if(canAccess('admin.apirole.massDelete')){
+        if(canAccess('admin.system.apirole.massDelete')){
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value'=>'mass_delete',
                 'label' =>'Delete Selected',
-                'url' => 'admin.apirole.massDelete',
+                'url' => 'admin.system.apirole.massDelete',
             ]);
         }
 
-        if (canAccess('admin.apirole.export')) {
+        if (canAccess('admin.system.apirole.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url' => 'admin.apirole.export',
+                'url' => 'admin.system.apirole.export',
             ]);
         }
     }
@@ -114,9 +114,9 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        if(canAccess('admin.apirole.add')){
+        if(canAccess('admin.system.apirole.add')){
             $this->button('add', [
-                'route' =>urlx('admin.apirole.add',[],true),
+                'route' =>urlx('admin.system.apirole.add',[],true),
                 'label' => 'Add Api Role',
             ]);
         }

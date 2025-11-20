@@ -91,7 +91,7 @@ class TranslationController extends BackendController
             }
     
             return redirect()
-                ->route('admin.translation.listing')
+                ->route('admin.system.translation.listing')
                 ->with('success', 'Record(s) saved successfully');
     
         } catch (\Exception $e) {
@@ -117,7 +117,7 @@ class TranslationController extends BackendController
             }
     
             if ($TranslationLocale && $TranslationLocale->id) {
-                return redirect()->route('admin.translation.listing')
+                return redirect()->route('admin.system.translation.listing')
                                  ->with('success', 'Record saved successfully');
             } else {
                 throw new Exception('Something went wrong while saving the record');
@@ -154,7 +154,7 @@ class TranslationController extends BackendController
             $translation = Translation::findOrFail($request->id);
             $translation->delete();
     
-            return redirect()->route('admin.translation.listing')
+            return redirect()->route('admin.system.translation.listing')
                              ->with('success', 'Record deleted');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -171,7 +171,7 @@ class TranslationController extends BackendController
     
             Translation::massDelete($ids);
     
-            return redirect()->route('admin.translation.listing')
+            return redirect()->route('admin.system.translation.listing')
                              ->with('success', 'Records deleted');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());

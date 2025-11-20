@@ -73,11 +73,11 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.cache.clear')){
+        if(canAccess('admin.system.cache.clear')){
             $this->action('clear', [
                 'id' => 'clearBtn',
                 'title' => 'Clear',
-                'url' => 'admin.cache.clear',
+                'url' => 'admin.system.cache.clear',
                 'class' => 'btn btn-warning btn-sm',
             ]);
         }
@@ -149,9 +149,9 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        if(canAccess('admin.cache.clearAll')){
+        if(canAccess('admin.system.cache.clearAll')){
             $this->button('clear_all', [
-                'route' => urlx('admin.cache.clearAll', [], true),
+                'route' => urlx('admin.system.cache.clearAll', [], true),
                 'label' => 'Clear All',
                 'class' => 'btn btn-danger',
             ]);

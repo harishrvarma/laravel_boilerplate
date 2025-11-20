@@ -13,7 +13,7 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        if(canAccess('admin.apiuser.massDelete')){
+        if(canAccess('admin.system.apiuser.massDelete')){
             $this->column('mass_ids', [
                 'name'=>'id',
                 'label'=>'',
@@ -49,38 +49,38 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.apiuser.edit')){
+        if(canAccess('admin.system.apiuser.edit')){
             $this->action('edit' , [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.apiuser.edit'
+                'url' => 'admin.system.apiuser.edit'
             ]);
         }
-        if(canAccess('admin.apiuser.delete')){
+        if(canAccess('admin.system.apiuser.delete')){
             $this->action('delete' , [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.apiuser.delete'
+                'url' => 'admin.system.apiuser.delete'
             ]);
         }
         return $this;
     }
 
     public function prepareMassActions(){
-        if(canAccess('admin.apiuser.massDelete')){
+        if(canAccess('admin.system.apiuser.massDelete')){
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value'=>'mass_delete',
                 'label' =>'Delete Selected',
-                'url' => 'admin.apiuser.massDelete',
+                'url' => 'admin.system.apiuser.massDelete',
             ]);
         }
 
-        if (canAccess('admin.apiuser.export')) {
+        if (canAccess('admin.system.apiuser.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url' => 'admin.apiuser.export',
+                'url' => 'admin.system.apiuser.export',
             ]);
         }
     }
@@ -121,9 +121,9 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        if(canAccess('admin.apiuser.add')){
+        if(canAccess('admin.system.apiuser.add')){
             $this->button('add', [
-                'route' =>urlx('admin.apiuser.add',[],true),
+                'route' =>urlx('admin.system.apiuser.add',[],true),
                 'label' => 'Add Api User',
             ]);
         }

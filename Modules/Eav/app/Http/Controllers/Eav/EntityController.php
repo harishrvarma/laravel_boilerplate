@@ -91,7 +91,7 @@ class EntityController extends BackendController
             }
 
 
-            return redirect()->route('admin.eav.entities.listing')
+            return redirect()->route('admin.system.eav.entities.listing')
                              ->with('success', 'Enttity Type saved');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -110,7 +110,7 @@ class EntityController extends BackendController
             }
             $row->delete();
 
-            return redirect()->route('admin.eav.entities.listing')
+            return redirect()->route('admin.system.eav.entities.listing')
                              ->with('success', 'Entity deleted');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -124,7 +124,7 @@ class EntityController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             Type::destroy($ids);
-            return redirect()->route('admin.eav.entities.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.eav.entities.listing')->with('success','Records deleted');
         }
         catch (\Throwable $th) {
             return redirect()->back()->with('error',$th);

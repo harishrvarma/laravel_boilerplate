@@ -15,7 +15,7 @@ class Edit extends CoreEdit
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.event.save')){
+        if(canAccess('admin.system.event.save')){
             $this->button('save',[
                 'id' => 'saveBtn',
                 'name'=>'Save',
@@ -27,15 +27,15 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.event.listing',[],true) . "'",
+            'method' => "window.location.href='" . urlx('admin.system.event.listing',[],true) . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row() && $this->row()->id){
-            return  urlx('admin.event.save',['id'=>$this->row()->id]);
+            return  urlx('admin.system.event.save',['id'=>$this->row()->id]);
         }
-        return  urlx('admin.event.save');
+        return  urlx('admin.system.event.save');
     }
 }

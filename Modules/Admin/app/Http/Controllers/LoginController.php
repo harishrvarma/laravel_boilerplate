@@ -38,7 +38,7 @@ class LoginController extends BackendController
         if (Auth::guard('admin')->attempt(['email' => $email, 'password' => $password])) {
             $request->session()->regenerate();
             $eventDispatcher->dispatch('login.log',['email'=>$email]);
-            return redirect()->route('admin.admin.listing');
+            return redirect()->route('admin.system.admin.listing');
         }
     
         return back()->withErrors([

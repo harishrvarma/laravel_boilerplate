@@ -47,7 +47,7 @@ class ResourceController extends BackendController
                 $resource = Resource::create($params);
             }
             if($resource->id){
-                return redirect()->route('admin.resource.listing')->with('success','Record saved');
+                return redirect()->route('admin.system.resource.listing')->with('success','Record saved');
             }
             else{
                 throw new Exception('Something went wrong');
@@ -86,7 +86,7 @@ class ResourceController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $resource->delete();
-            return redirect()->route('admin.resource.listing')->with('success','Record deleted');
+            return redirect()->route('admin.system.resource.listing')->with('success','Record deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);
@@ -101,7 +101,7 @@ class ResourceController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             Resource::destroy($ids);
-            return redirect()->route('admin.resource.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.resource.listing')->with('success','Records deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);

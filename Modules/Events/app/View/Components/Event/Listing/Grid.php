@@ -13,7 +13,7 @@ class Grid extends CoreGrid
     }
     public function prepareColumns()
     {
-        if(canAccess('admin.event.massDelete')){
+        if(canAccess('admin.system.event.massDelete')){
             $this->column('mass_ids', [
                 'name'=>'id',
                 'label'=>'',
@@ -52,18 +52,18 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.event.edit')){
+        if(canAccess('admin.system.event.edit')){
             $this->action('edit' , [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.event.edit'
+                'url' => 'admin.system.event.edit'
             ]);
         }
-        if(canAccess('admin.event.delete')){
+        if(canAccess('admin.system.event.delete')){
             $this->action('delete' , [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.event.delete'
+                'url' => 'admin.system.event.delete'
             ]);
         }
         return $this;
@@ -80,20 +80,20 @@ class Grid extends CoreGrid
     }
 
     public function prepareMassActions(){
-        if(canAccess('admin.event.massDelete')){
+        if(canAccess('admin.system.event.massDelete')){
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value'=>'mass_delete',
                 'label' =>'Delete Selected',
-                'url' => 'admin.event.massDelete',
+                'url' => 'admin.system.event.massDelete',
             ]);
         }
 
-        if (canAccess('admin.event.export')) {
+        if (canAccess('admin.system.event.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url' => 'admin.event.export',
+                'url' => 'admin.system.event.export',
             ]);
         }
     }
@@ -118,9 +118,9 @@ class Grid extends CoreGrid
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.event.add')){
+        if(canAccess('admin.system.event.add')){
             $this->button('add', [
-                'route' =>route('admin.event.add'),
+                'route' =>route('admin.system.event.add'),
                 'label' => 'Add Event',
             ]);
         }

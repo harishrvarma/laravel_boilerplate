@@ -42,7 +42,7 @@ class ApiRoleController extends BackendController
     
                 $role->resources()->sync($resourceIds);
     
-                return redirect()->to(urlx('admin.apirole.edit'))->with('success', 'Record saved');
+                return redirect()->to(urlx('admin.system.apirole.edit'))->with('success', 'Record saved');
             } else {
                 $params = $request->post('apirole');
     
@@ -71,7 +71,7 @@ class ApiRoleController extends BackendController
                 }
     
                 if ($apiRole->id) {
-                    return redirect()->route('admin.apirole.edit', ['id' => $apiRole->id])
+                    return redirect()->route('admin.system.apirole.edit', ['id' => $apiRole->id])
                                      ->with('success', 'Record saved');
                 } else {
                     throw new Exception('Something went wrong');
@@ -110,7 +110,7 @@ class ApiRoleController extends BackendController
                 throw new Exception("Invalid Request");
             }
             $apiRole->delete();
-            return redirect()->route('admin.apirole.listing')->with('success','Record deleted');
+            return redirect()->route('admin.system.apirole.listing')->with('success','Record deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);
@@ -125,7 +125,7 @@ class ApiRoleController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             ApiRole::destroy($ids);
-            return redirect()->route('admin.apirole.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.apirole.listing')->with('success','Records deleted');
         }
         catch (Exception $e){
             return redirect()->back()->with('error',$e);

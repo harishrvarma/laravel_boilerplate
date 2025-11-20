@@ -16,7 +16,7 @@ class Grid extends CoreGrid
 
     public function prepareColumns()
     {
-        if (canAccess('admin.translation.massDelete')) {
+        if (canAccess('admin.system.translation.massDelete')) {
             $this->column('mass_ids', [
                 'name' => 'id',
                 'label' => '',
@@ -72,18 +72,18 @@ class Grid extends CoreGrid
 
     public function prepareActions()
     {
-        if(canAccess('admin.translation.edit')){
+        if(canAccess('admin.system.translation.edit')){
             $this->action('edit' , [
                 'id' => 'editBtn',
                 'title' => 'Edit',
-                'url' => 'admin.translation.edit'
+                'url' => 'admin.system.translation.edit'
             ]);
         }
-        if(canAccess('admin.translation.delete')){
+        if(canAccess('admin.system.translation.delete')){
             $this->action('delete' , [
                 'id' => 'deleteBtn',
                 'title' => 'Delete',
-                'url' => 'admin.translation.delete'
+                'url' => 'admin.system.translation.delete'
             ]);
         }
         return $this;
@@ -136,20 +136,20 @@ class Grid extends CoreGrid
     
 
     public function prepareMassActions(){
-        if(canAccess('admin.translation.massDelete')){
+        if(canAccess('admin.system.translation.massDelete')){
             parent::prepareMassActions();
             $this->massAction('delete', [
                 'value'=>'mass_delete',
                 'label' =>'Delete Selected',
-                'url' => 'admin.translation.massDelete',
+                'url' => 'admin.system.translation.massDelete',
             ]);
         }
 
-        if (canAccess('admin.translation.export')) {
+        if (canAccess('admin.system.translation.export')) {
             $this->massAction('export', [
                 'value' => 'mass_export',
                 'label' => 'Export',
-                'url' => 'admin.translation.export',
+                'url' => 'admin.system.translation.export',
             ]);
         }
     }
@@ -175,15 +175,15 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        if(canAccess('admin.translation.add')){
+        if(canAccess('admin.system.translation.add')){
             $this->button('add', [
-                'route' =>urlx('admin.translation.add',[],true),
+                'route' =>urlx('admin.system.translation.add',[],true),
                 'label' => 'Add Translation',
             ]);
         }
-        if(canAccess('admin.translation.addLocale')){
+        if(canAccess('admin.system.translation.addLocale')){
             $this->button('addLocale', [
-                'route' =>urlx('admin.translation.addLocale',[],true),
+                'route' =>urlx('admin.system.translation.addLocale',[],true),
                 'label' => 'Add Language',
             ]);
         }

@@ -14,7 +14,7 @@ class Edit extends CoreEdit
     }
 
     public function prepareButtons(){
-        if(canAccess('admin.admin.save')){
+        if(canAccess('admin.system.admin.save')){
             $this->button('save',[
                 'id' => 'saveBtn',
                 'name'=>'Save',
@@ -22,12 +22,12 @@ class Edit extends CoreEdit
             ]);
         }
 
-        if(canAccess('admin.admin.save')){
+        if(canAccess('admin.system.admin.save')){
             $this->button('saveandcontinue',[
                 'id' => 'saveandcontinueBtn',
                 'name'=>'Save & Continue',
                 'class'=>'btn btn-primary',
-                'method' => "this.form.action = '" . urlx('admin.admin.save',['continue' => 1]) . "'; this.form.submit();",
+                'method' => "this.form.action = '" . urlx('admin.system.admin.save',['continue' => 1]) . "'; this.form.submit();",
             ]);
         }
 
@@ -35,15 +35,15 @@ class Edit extends CoreEdit
             'id' => 'backBtn',
             'name'=>'Back',
             'class'=>'btn btn-secondary',
-            'method' => "window.location.href='" . urlx('admin.admin.listing') . "'",
+            'method' => "window.location.href='" . urlx('admin.system.admin.listing') . "'",
         ]);
         return $this;
     }
 
     public function saveUrl(){
         if($this->row()->id){
-            return urlx('admin.admin.save',['id'=>$this->row()->id]);
+            return urlx('admin.system.admin.save',['id'=>$this->row()->id]);
         }
-        return urlx('admin.admin.save');
+        return urlx('admin.system.admin.save');
     }
 }

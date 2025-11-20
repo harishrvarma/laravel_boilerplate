@@ -134,9 +134,9 @@ class Grid extends CoreGrid
 
     public function prepareButtons()
     {
-        if (canAccess('admin.eav.attributes.config.save')) {
+        if (canAccess('admin.system.eav.attributes.config.save')) {
             $this->button('save', [
-                'method' => "document.getElementById('main-form').action='" . route('admin.eav.attributes.config.save') . "'; document.getElementById('main-form').submit();",
+                'method' => "document.getElementById('main-form').action='" . route('admin.system.eav.attributes.config.save') . "'; document.getElementById('main-form').submit();",
                 'label' => 'Save Config',
             ]);
         }

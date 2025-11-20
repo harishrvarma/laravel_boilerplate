@@ -181,7 +181,7 @@ class AttributeController extends BackendController
 
     
             return redirect()
-                ->route('admin.eav.attributes.listing')
+                ->route('admin.system.eav.attributes.listing')
                 ->with('success', 'Attribute and options saved successfully.');
     
         } catch (\Throwable $th) {
@@ -201,7 +201,7 @@ class AttributeController extends BackendController
             }
             $row->delete();
 
-            return redirect()->route('admin.eav.attributes.listing')
+            return redirect()->route('admin.system.eav.attributes.listing')
                              ->with('success', 'Attribute deleted');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -215,7 +215,7 @@ class AttributeController extends BackendController
                 throw new Exception('Invalid Ids');
             }
             Attribute::destroy($ids);
-            return redirect()->route('admin.eav.attributes.listing')->with('success','Records deleted');
+            return redirect()->route('admin.system.eav.attributes.listing')->with('success','Records deleted');
         }
         catch (\Throwable $th) {
             return redirect()->back()->with('error',$th);
