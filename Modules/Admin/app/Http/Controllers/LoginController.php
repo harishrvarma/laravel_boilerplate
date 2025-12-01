@@ -15,7 +15,7 @@ class LoginController extends BackendController
     public function index(Request $request)
     {
         if (\Auth::guard('admin')->check()) {
-            return redirect()->route('admin.admin.listing');
+            return redirect()->route('admin.system.admin.listing');
         }
         $layout = $this->layout();
         $layout->template('admin::components.admin.layout.blank');
